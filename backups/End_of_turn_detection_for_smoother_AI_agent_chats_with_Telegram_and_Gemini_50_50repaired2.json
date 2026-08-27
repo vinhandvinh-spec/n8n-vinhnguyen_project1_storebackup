@@ -1,0 +1,1188 @@
+{
+  "updatedAt": "2026-08-26T10:05:27.942Z",
+  "createdAt": "2026-08-26T01:47:28.421Z",
+  "id": "x4Z4CWgu5HzmiPpE",
+  "name": "End of turn detection for smoother AI agent chats with Telegram and Gemini 50-50repaired2",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "94565103-3d53-428e-adc6-ebf83355e075",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "position": [
+        592,
+        432
+      ],
+      "webhookId": "dce8f9a4-86d1-4dd9-a83a-4de75185ae21",
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "JNZRFUkL5kKbrz0g",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "c1de1edb-51cb-44f8-8c37-c7e7494138f9",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        2784,
+        1232
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=session/{{ $('Session Ref').first().json.data.from }}/agent",
+        "contextWindowLength": 10
+      },
+      "id": "abbf6685-047b-4b93-801a-7d2bde1d82d3",
+      "name": "Redis Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "position": [
+        3280,
+        912
+      ],
+      "typeVersion": 1.5,
+      "credentials": {
+        "redis": {
+          "id": "VNHLUqCBC91VZctr",
+          "name": "Redis account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7cee3033-0615-43ac-93fd-5397c759e6a3",
+              "name": "from",
+              "type": "string",
+              "value": "={{ $json.message.chat.id }}"
+            },
+            {
+              "id": "c2bb1875-7074-411f-a14a-42c699e5bdc1",
+              "name": "message",
+              "type": "string",
+              "value": "={{ $json.message.text }}"
+            },
+            {
+              "id": "34d5087e-79be-4181-b839-0a55b95133e8",
+              "name": "createdAt",
+              "type": "string",
+              "value": "={{ $now.toISO() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b364cc18-d2f9-428a-bd13-5ccaabedb05a",
+      "name": "Get Values",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1024,
+        448
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=session/{{ $json.from || $json.data?.from || 'default_user' }}",
+        "value": "={{\n  JSON.stringify({\n    ...($json.data ?? {}),\n    messages: [\n      ...($json.data?.messages \n          ? (typeof $json.data.messages === 'string' \n              ? JSON.parse($json.data.messages) \n              : $json.data.messages)\n          : []),\n      {\n        value: $json.message || $json.body?.message || \"\",\n        createdAt: new Date().toISOString()\n      }\n    ],\n    from: $json.from || $json.data?.from || \"default_user\"\n  })\n}}",
+        "keyType": "hash",
+        "expire": true
+      },
+      "id": "253ef8ed-887d-4aa9-92d9-250f7f1b7c98",
+      "name": "Update Session",
+      "type": "n8n-nodes-base.redis",
+      "position": [
+        976,
+        848
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "redis": {
+          "id": "VNHLUqCBC91VZctr",
+          "name": "Redis account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "data",
+        "key": "=session/{{ $json.from }}",
+        "options": {}
+      },
+      "id": "89aa1fa2-1f62-4fd8-b632-4035f278f7b3",
+      "name": "Get Session",
+      "type": "n8n-nodes-base.redis",
+      "position": [
+        736,
+        1296
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "credentials": {
+        "redis": {
+          "id": "nCtuSYCnsErSLMhQ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0e37d8ff-3d04-4224-84cc-defa80dc4a8b",
+              "operator": {
+                "name": "filter.operator.equals",
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $('Get Session').item.json.data?.state ?? '' }}",
+              "rightValue": "waiting"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "7706b618-443a-4ec5-901c-9510ce52b341",
+      "name": "Is Waiting?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1792,
+        1328
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=session/{{ $('Session Ref').first().json.data.from }}",
+        "value": "={{\n{\n  state: 'waiting',\n  resumeUrl: $execution.resumeUrl\n}\n}}",
+        "keyType": "string",
+        "expire": true
+      },
+      "id": "7fc19d46-7062-4a09-8712-f814e3c0fe69",
+      "name": "Update Session1",
+      "type": "n8n-nodes-base.redis",
+      "position": [
+        1904,
+        608
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "redis": {
+          "id": "VNHLUqCBC91VZctr",
+          "name": "Redis account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "71db97f1-e5ba-49d1-8a9a-b9df3a989c77",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ !$json.data?.state }}",
+              "rightValue": ""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "95634bec-c014-4368-b493-89555433fcab",
+      "name": "is New Session?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1312,
+        1008
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "id": "7fa16e15-d11a-4dab-9050-4223fc983760",
+      "name": "Google Gemini Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        2592,
+        1232
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "data",
+        "key": "=session/{{ $('Session Ref').first().json.data.from }}",
+        "keyType": "hash",
+        "options": {}
+      },
+      "id": "1eb85f38-7d94-4267-9dec-eb556627e46e",
+      "name": "Get Session2",
+      "type": "n8n-nodes-base.redis",
+      "position": [
+        2592,
+        768
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "redis": {
+          "id": "VNHLUqCBC91VZctr",
+          "name": "Redis account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "6da4c1e5-4eaf-476a-87bc-8690e173cf40",
+      "name": "Session Ref",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        1744,
+        608
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "398277f7-9386-4f99-ab9c-f99fe59c872e",
+              "operator": {
+                "type": "object",
+                "operation": "empty",
+                "singleValue": true
+              },
+              "leftValue": "={{ Object.assign({}, $json.data ?? {}) }}",
+              "rightValue": ""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "88b8228a-1200-478f-8a72-d9905e0aae88",
+      "name": "Session Ended?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        2752,
+        768
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {},
+      "id": "24856ffe-f6b0-49af-b329-620325e6d66b",
+      "name": "Wait For Webhook",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        2432,
+        768
+      ],
+      "webhookId": "d753b11d-0a61-40e5-b1c4-d217e106eaac",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "=session/{{ $('Session Ref').first().json.data.from }}"
+      },
+      "id": "4f7b8a1b-a24e-4aa7-b11a-84bfbd576579",
+      "name": "Update Session2",
+      "type": "n8n-nodes-base.redis",
+      "position": [
+        3488,
+        624
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "redis": {
+          "id": "VNHLUqCBC91VZctr",
+          "name": "Redis account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bff0d1a5-1d78-4af6-a643-b2fd28f10fba",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "/"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "054b2bd8-7389-4756-92eb-f8bde459997d",
+      "name": "Is Bot command?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        768,
+        448
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "inputText": "={{\n  ($node['Session Ref']?.json?.data?.messages || [])\n    .map(msg => msg.value || '')\n    .filter(text => text.trim() !== '')\n    .join(' ') || 'Hello'\n}}",
+        "categories": {
+          "categories": [
+            {
+              "category": "end_of_utterance",
+              "description": "The user has reached their end of turn or end_of_utterance"
+            },
+            {
+              "category": "has_more_to_follow",
+              "description": "The user has not finished their message or turn or reached their end of utterance"
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "=You are an NLP classifier. Analyze the provided text and determine whether the message is complete.\nCRITICAL: You MUST respond with ONLY one of the following exact category keys, with no extra formatting, markdown, or explanation:\n- end_of_utterance\n- has_more_to_follow\n## Techniques to use\n* Temporal Threshold (Inactivity Delay) - Use a decay model—each consecutive message shortens the threshold unless punctuation suggests completeness.\n* Punctuation Patterns - Strong indicators of message completeness: Ends with period ., question mark ?, or exclamation mark !. Ends with an emoji or newline after a complete sentence. Weak or uncertain indicators: Ellipsis ... → often implies continuation. Dash - or incomplete sentence → wait for more.\n* Linguistic Features - Lexical cues (last word, punctuation). Part-of-speech tags (is the sentence syntactically complete?). Message length and position in sequence. Semantic cues like discourse markers: \"anyway\", \"so\", \"that's all\"\n* Conversational Cues (Pragmatic Signals) - \"That's it\", \"Done\", \"Hope that helps\", \"Thanks\" → End markers. \"Let me continue\", \"Hold on\", \"Part 2\" → Continuation markers.\n\n### Sample Dataset\nLabel: 1 = end_of_utterance, 0 = has_more_to_follow, error\n\n* \"Here's the plan for tomorrow.\" = 1,\n* \"First, we meet at 9am.\" = 0,\n* \"Then we head to the venue\" = 0,\n* \"...and set everything up.\" = 0,\n* \"Let me know if you're free!\" = 1,\n* \"Part 1 of the idea is this\" = 0,\n* \"More to come\" = 0,\n* \"That's all!\" = 1,\n* \"Thanks!\" = 1\n* \"Next, we should discuss logistics\" = 0\n* error when message is empty or no meaning\n"
+        }
+      },
+      "id": "ef7abfe3-3d61-41e8-8481-52455c722def",
+      "name": "Predict End of Utterance",
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "position": [
+        2064,
+        608
+      ],
+      "typeVersion": 1.1,
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Session Ref').first().json.data.from }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "fbececb4-406b-4bf7-b2f1-8dbb8f20d2e2",
+      "name": "Respond to User",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        3664,
+        624
+      ],
+      "webhookId": "c095b0ea-c349-4ab7-8b16-efa5f4c22299",
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "JNZRFUkL5kKbrz0g",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 1. Accept Telegram messages\n[Read more about the Telegram Trigger](https://docs.n8n.io/integrations/builtin/trigger-nodes/n8n-nodes-base.telegramtrigger)\n\nThis template will only work with chat systems where not every incoming message needs a reply - this unfortunately rules out n8n's built in chat trigger. For demonstration purposes, we'll use Telegram and in this set up, we have designed it to capture as many messages from a single user as possible without blocking the execution.",
+        "height": 440,
+        "width": 1020,
+        "color": 7
+      },
+      "id": "7779d4ec-c905-427f-86eb-e42f91d2000b",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        512,
+        224
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 2. Determine If New Message\n[Learn more about the subworkflow trigger](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.executeworkflowtrigger)\n\nOur goal is ultimately to not \"interrupt\" the user. We do so by buffering presumed partial messages until we can predict that the user has reached the end of what they want to say. Before we can do that however, we need to first determine if the message received is a new message or \"utterance\". For this task, we'll use simple session/state management via Redis to create temporary data to collect each incoming utterance and track our progress.",
+        "height": 560,
+        "width": 1020,
+        "color": 7
+      },
+      "id": "3594b952-d99c-4836-8692-4732b6692b01",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        512,
+        704
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 3. Prediction Loop Already Running? Let's Resume!\n[Read more about the HTTP node](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.httprequest/)\n\nUsing the session data, we can check if a prediction loop is already running and if so, resume it rather than starting a new one. The HTTP request is used to trigger the \"resume_url\" of the prediction loop wait node.",
+        "height": 460,
+        "width": 660,
+        "color": 7
+      },
+      "id": "16c96fd2-09c6-4f16-a907-4af83e572901",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1632,
+        1088
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 2. Start of a New Utterance? Start the Prediction Wait Loop.\n[Learn more about the Text Classifier node](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.text-classifier)\n\nPredicting when a user has finished their thought during a casual text or call is surprisingly difficult. Although some heuristics and natural language processing (NLP) tools exist, I wanted to explore whether large language models (LLMs) could effectively handle this task.\n\nI implemented a basic text classifier and fine-tuned its prompt to predict message completion. If the model determines a message is incomplete, the workflow pauses using a wait node. This node doesn't operate on a timer; instead, it needs to be triggered by a HTTP request to resume. The trick is when we get new messages, we use those executions to resume the paused wait node if it exists. Once the wait node resumes, it combined the new message with the previous messages and sends them to the classifier for a new prediction.\n\nThe loop continues until the model identifies the message as complete, at which point the full conversation is sent to the agent. As a fallback, if the session is somehow lost - maybe due to expiry, the loop is abandoned and the new chat message is sent to the agent instead.",
+        "height": 800,
+        "width": 1340,
+        "color": 7
+      },
+      "id": "5691a987-df3e-4666-8795-4096ab7e3132",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1648,
+        224
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 4. Send Reply Only When End of Utterance is Detected\n[Read more about the AI Agent node](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent/)\n\nFinally! With the buffered messages combined and sent to the agent, we're now able to generate a reply to the user. The end experience is seemingly much closer to a natural conversation with a human as there is no artificial delays needed.\n\nThe last thing to do then is to clear out the temporary session for the utterance. This allows our workflow to recognise the next chat message as a new utterance.",
+        "height": 660,
+        "width": 840,
+        "color": 7
+      },
+      "id": "e81cb0e7-7e06-4c19-b70f-ab335843021c",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3024,
+        384
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.data.resumeUrl }}",
+        "options": {}
+      },
+      "id": "cc63d467-f0a3-4163-9644-0441716cc23e",
+      "name": "Resume Wait Node",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2000,
+        1328
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "content": "## Try It Out!\n### This n8n template demonstrates one approach to achieve a more natural and less frustration conversations with AI agents by reducing interrupts by predicting the end of user utterances.\n\nWhen we text or chat casually, it's not uncommon to break our sentences over multiple messages or when it comes to voice, break our speech with the odd pause or umms and ahhs. If an agent replies to every message, it's likely to interrupt us before we finish our thoughts and it can get very annoying!\n\nPreviously, I demonstrated a [simple technique for buffering each incoming message by 5 seconds](https://n8n.io/workflows/2346-enhance-customer-chat-by-buffering-messages-with-twilio-and-redis/) but that approach still suffers in some scenarios when more time is needed. This technique has no arbitrary time limit and instead uses AI to figure out when its the agent's turn based on the user's message, allowing for the user to take all the time they need.\n\n### How it works\n* Telegram messages are received but no reply is generated for them by default. Instead they are sent to the prediction subworkflow to determine if a reply should be generated.\n* The prediction subworkflow begins by checking Redis for the current user's prediction session state. If this is a new \"utterance\", it kicks off the \"predict end of utterance\" loop - the purpose of which is to buffer messages in a smart way!\n* New users message can continue to be accepted by the workflow until enough is collected to allow our prediction classifier to determine the end of the utterance has been reached.\n* The loop is then broken and the buffered chat messages are combined and sent to the AI agent to generate a response and sent to the user via the telegram node.\n* The prediction session state is then deleted to signal the workflow is ready to start again with a new message.\n\n### How to use\n* This system sits between your preferred chat platform and the AI agent so all you need to do is replace the telegram nodes as required.\n* Where LLM-only prediction isn't working well enough, consider more traditional code-based checking of heuristics to improve the detection.\n* Ideally you'll want a fast but accurate LLM so your user isn't waiting longer than they have to - at time of writing Gemini-2.5-flash-lite was the fastest in testing but keep a look out for smaller and more powerful LLMs in the future.\n\n### Requirements\n* Gemini for LLM\n* Redis for session management\n* Telegram for chat platform\n\n### Need Help?\nJoin the [Discord](https://discord.com/invite/XPKeKXeB7d) or ask in the [Forum](https://community.n8n.io/)!\n\nHappy Hacking!",
+        "height": 1260,
+        "width": 460
+      },
+      "id": "f95a6e4d-6f40-4e75-b07a-e8eeeeeec298",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $workflow.id }}"
+        },
+        "workflowInputs": {
+          "value": {
+            "from": "={{ $json.from }}",
+            "message": "={{ $json.message }}",
+            "createdAt": "={{ $json.createdAt }}"
+          },
+          "schema": [
+            {
+              "id": "from",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "from",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "message",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "createdAt",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "createdAt",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "id": "75c6306c-dfa2-4bb6-810d-27a190a5db7c",
+      "name": "Call Prediction Subworkflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "position": [
+        1184,
+        448
+      ],
+      "typeVersion": 1.2,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "from"
+            },
+            {
+              "name": "message"
+            },
+            {
+              "name": "createdAt"
+            }
+          ]
+        }
+      },
+      "id": "d8ebb35d-babb-41a1-815b-1863b7922bac",
+      "name": "Prediction Subworkflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        1376,
+        624
+      ],
+      "typeVersion": 1.1,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ed66f412-aa70-4838-9295-bed652d62bfd",
+              "name": "data",
+              "type": "object",
+              "value": "={{ $('Update Session').isExecuted ? $('Update Session').item.json.data : ($('Get Session').item.json.data ?? {}) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1e9692b4-45ec-4a91-b623-cc20605b8e7f",
+      "name": "Get Updated Session Values",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1152,
+        1024
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        2000,
+        816
+      ],
+      "id": "648e3cbe-11c2-44d9-905c-9fa7c138ea54",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "833FO5mcRF5PeQv2",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        3104,
+        928
+      ],
+      "id": "b2001b67-d5d4-4eaf-80e5-72baf370b8c4",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "833FO5mcRF5PeQv2",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendSticker",
+        "chatId": "={{ $json.data?.from || $json.from || $node['Session Ref']?.json?.data?.from }}",
+        "file": "=CAACAgEAAxkBAAERr9NqecMAAT--c1QRtPKgb8Q4G5JSKHcAAiQBAAI4DoIR8VL_mIazBlw9BA",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3216,
+        1264
+      ],
+      "id": "ee27f9a5-1737-4e4f-b0cc-ebd51891bd4b",
+      "name": "Send a sticker",
+      "webhookId": "168a2d98-f2d1-413d-9d57-00bd490aedad",
+      "credentials": {
+        "telegramApi": {
+          "id": "JNZRFUkL5kKbrz0g",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a8558a34-b25c-476c-b837-f98e5b084403",
+              "name": "from",
+              "value": "={{ $json.from }}",
+              "type": "string"
+            },
+            {
+              "id": "4d8ab6c1-6d8b-46ca-be4a-64e42f438205",
+              "name": "message",
+              "value": "={{ $json.message }}",
+              "type": "string"
+            },
+            {
+              "id": "344c35d2-b841-4f7b-ada2-3f92b192350b",
+              "name": "createdAt",
+              "value": "={{ $json.createdAt }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        496,
+        1008
+      ],
+      "id": "3bbd2622-5b00-429f-b4a1-9e74ab8a7064",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=session/{{ $json.from || $json.data?.from || 'default_user' }}",
+        "value": "={{\n  JSON.stringify({\n    ...($json.data ?? {}),\n    messages: [\n      ...($json.data?.messages \n          ? (typeof $json.data.messages === 'string' \n              ? JSON.parse($json.data.messages) \n              : $json.data.messages)\n          : []),\n      {\n        value: $json.message || $json.body?.message || \"\",\n        createdAt: new Date().toISOString()\n      }\n    ],\n    from: $json.from || $json.data?.from || \"default_user\"\n  })\n}}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        624,
+        832
+      ],
+      "id": "7586e93d-b239-4c9d-92c9-6c55dfce274d",
+      "name": "Redis",
+      "credentials": {
+        "redis": {
+          "id": "VNHLUqCBC91VZctr",
+          "name": "Redis account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9ab8b7e9-c8e1-4394-bcab-15686a55ad27",
+              "leftValue": "={{ $json.data }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        944,
+        1296
+      ],
+      "id": "708ceb28-5673-4bb3-b2f8-af3dd15e9619",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{\n  ($node['Session Ref']?.json?.data?.messages || [])\n    .map(msg => msg.value || '')\n    .filter(text => text.trim() !== '')\n    .join(' ') || 'Hello'\n}}",
+        "options": {
+          "systemMessage": "Do not format your response in markdown, use plain text instead."
+        }
+      },
+      "id": "63dbbf58-6a1c-4b7c-b5c6-4b2987c3566b",
+      "name": "AI Agent1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        3120,
+        144
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{\n  ($node['Session Ref']?.json?.data?.messages || [])\n    .map(msg => msg.value || '')\n    .filter(text => text.trim() !== '')\n    .join(' ') || 'Hello'\n}}",
+        "options": {
+          "systemMessage": "Do not format your response in markdown, use plain text instead."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        3104,
+        656
+      ],
+      "id": "f6333ec1-02b1-4ed7-94df-c9f9e47903c4",
+      "name": "AI Agent"
+    }
+  ],
+  "connections": {
+    "Get Values": {
+      "main": [
+        [
+          {
+            "node": "Call Prediction Subworkflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Session": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Waiting?": {
+      "main": [
+        [
+          {
+            "node": "Resume Wait Node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Session Ref": {
+      "main": [
+        [
+          {
+            "node": "Update Session1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Session2": {
+      "main": [
+        [
+          {
+            "node": "Session Ended?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Session Ended?": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Session Ref",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Session": {
+      "main": [
+        [
+          {
+            "node": "Get Updated Session Values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Bot command?": {
+      "main": [
+        [
+          {
+            "node": "Get Values",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Update Session1": {
+      "main": [
+        [
+          {
+            "node": "Predict End of Utterance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Session2": {
+      "main": [
+        [
+          {
+            "node": "Respond to User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "is New Session?": {
+      "main": [
+        [
+          {
+            "node": "Session Ref",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Waiting?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Is Bot command?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait For Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get Session2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prediction Subworkflow": {
+      "main": [
+        []
+      ]
+    },
+    "Predict End of Utterance": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait For Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a sticker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Updated Session Values": {
+      "main": [
+        [
+          {
+            "node": "is New Session?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Predict End of Utterance",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Prediction Subworkflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis": {
+      "main": [
+        [
+          {
+            "node": "Get Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get Updated Session Values",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        []
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Update Session2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "735371b8-7a4d-4f72-834e-c013079956b9",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-08-26T01:47:28.421Z",
+      "createdAt": "2026-08-26T01:47:28.421Z",
+      "role": "workflow:owner",
+      "workflowId": "x4Z4CWgu5HzmiPpE",
+      "projectId": "qXi1KgDY8Rs5YRaI"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
