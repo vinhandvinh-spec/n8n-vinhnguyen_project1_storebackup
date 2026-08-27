@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-08-27T02:48:44.753Z",
-  "createdAt": "2026-08-26T14:19:29.974Z",
-  "id": "bpg0GPTVnkUTHkb4",
+  "updatedAt": "2026-08-27T02:42:59.008Z",
+  "createdAt": "2026-08-27T02:41:56.538Z",
+  "id": "g1tMceUrvnjWTqU7",
   "name": "wflow00",
   "active": false,
   "isArchived": false,
@@ -14,7 +14,7 @@
         0,
         0
       ],
-      "id": "d77b4df1-5ddc-4d54-b1de-1a1fd3f1a2eb",
+      "id": "e449c280-db86-4118-94ee-de0bf5a24ade",
       "name": "When clicking ‘Execute workflow’"
     },
     {
@@ -28,7 +28,7 @@
         208,
         0
       ],
-      "id": "e694e594-73cf-4a5e-9cf8-25510741c5e3",
+      "id": "1996fc05-33d1-477c-887f-1e32d9ee524b",
       "name": "Execute a SQL query",
       "credentials": {
         "postgres": {
@@ -58,20 +58,19 @@
   },
   "staticData": null,
   "meta": {
-    "templateId": "4928",
     "templateCredsSetupCompleted": true
   },
   "nodeGroups": [],
   "pinData": {},
-  "versionId": "48d8ab60-40e2-4a26-8b78-8357187e48e7",
+  "versionId": "ed09f1c0-2595-470a-94c2-49c8d73ce045",
   "activeVersionId": null,
   "triggerCount": 0,
   "shared": [
     {
-      "updatedAt": "2026-08-26T14:19:29.974Z",
-      "createdAt": "2026-08-26T14:19:29.974Z",
+      "updatedAt": "2026-08-27T02:41:56.538Z",
+      "createdAt": "2026-08-27T02:41:56.538Z",
       "role": "workflow:owner",
-      "workflowId": "bpg0GPTVnkUTHkb4",
+      "workflowId": "g1tMceUrvnjWTqU7",
       "projectId": "qXi1KgDY8Rs5YRaI"
     }
   ],
