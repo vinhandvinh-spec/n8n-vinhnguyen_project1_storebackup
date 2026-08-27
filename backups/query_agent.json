@@ -1,0 +1,90 @@
+{
+  "updatedAt": "2026-08-26T13:56:57.078Z",
+  "createdAt": "2026-08-26T12:56:38.961Z",
+  "id": "ktONTUVMp4ANm1an",
+  "name": "query agent",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS \"n8n_telegram_message\" (\n    \"id\" BIGSERIAL PRIMARY KEY,\n    \"theadID\" VARCHAR(255),\n    \"messagecontent\" TEXT,\n    \"creat_at\" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -112,
+        -112
+      ],
+      "id": "aef2ab94-1456-4a5e-a5e0-930f510cb8ce",
+      "name": "Creat table1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "pQHgIuziKCbMOMzX",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM n8n_telegram_message ORDER BY id DESC LIMIT 200;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        144,
+        -112
+      ],
+      "id": "6d6c2a78-a947-45fd-92ef-3ffaf396d356",
+      "name": "show result table",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "pQHgIuziKCbMOMzX",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Creat table1": {
+      "main": [
+        [
+          {
+            "node": "show result table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "e0b607b4-7346-4d70-b3b4-2ffa42358689",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-08-26T12:56:38.961Z",
+      "createdAt": "2026-08-26T12:56:38.961Z",
+      "role": "workflow:owner",
+      "workflowId": "ktONTUVMp4ANm1an",
+      "projectId": "qXi1KgDY8Rs5YRaI"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
