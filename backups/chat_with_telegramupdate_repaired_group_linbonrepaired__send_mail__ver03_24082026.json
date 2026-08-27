@@ -1,0 +1,2223 @@
+{
+  "updatedAt": "2026-08-24T06:32:25.884Z",
+  "createdAt": "2026-08-24T05:24:44.953Z",
+  "id": "0Mc9btOFiI6y6LWG",
+  "name": "chat with telegramupdate repaired group linbonrepaired (send mail) ver03-24082026",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "811fe42d-dd77-423f-a7ab-08af9cf6e9a2",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        5952,
+        2288
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "833FO5mcRF5PeQv2",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "74867bf1-2fb7-4272-ad3a-aa9bbe3a389d",
+      "name": "SerpAPI",
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "position": [
+        6352,
+        2208
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "serpApi": {
+          "id": "ODeFyk7FlG1jNeVY",
+          "name": "SerpApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.data.content }}",
+        "options": {
+          "systemMessage": "Bạn ta chuyên gia, hãy tư vấn cho khách hàng, trả lời một lần, không lặp lại theo dưới đây:\n- Trường hợp tốt: tin nhắn rõ ràng\n- Trường hợp tệ: tin nhắn không rõ"
+        }
+      },
+      "id": "20ea0fdb-9be1-4ac8-9cd8-79bc7505d878",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        6112,
+        1984
+      ],
+      "typeVersion": 1.8,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "$json.sender.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        6096,
+        2224
+      ],
+      "id": "b0dac7d8-37f2-44ee-879d-6baa9a52a2e1",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "threadId": "=7280655782332324476",
+        "type": 1,
+        "message": "={{ $json.output }}",
+        "quote": {},
+        "mentions": {}
+      },
+      "type": "n8n-nodes-zalos-user.zaloSendMessage",
+      "typeVersion": 4,
+      "position": [
+        7376,
+        2016
+      ],
+      "id": "95067e26-5eff-48ce-a554-c3780f134775",
+      "name": "Zalo Send Message",
+      "credentials": {
+        "zaloApi": {
+          "id": "TZHEd45BFslMGcZV",
+          "name": "097943..._VinhNguyen... _ 05:56 24/08"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "319a56f3-cefa-4119-881e-9480d79853a8",
+              "leftValue": "={{ $json.message.data.uidFrom }}",
+              "rightValue": "=564720991332328608",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "4018db8c-fdfe-45d0-ab47-559316b9d23c",
+              "leftValue": "={{ $json.message.data.idTo }}",
+              "rightValue": "7280655782332324476",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": "={{ false }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        5264,
+        1984
+      ],
+      "id": "70dd6346-b747-4264-9d79-bf1ac7c0368c",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        5472,
+        2272
+      ],
+      "id": "634178e2-7d90-44e6-8095-94553ebc9fd9",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        6144,
+        2368
+      ],
+      "id": "7eb3cac1-c138-4203-b123-3bf8664c629e",
+      "name": "Calculator"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        6256,
+        2256
+      ],
+      "id": "91795971-f990-4467-9963-5d81626eb374",
+      "name": "Calculator1"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "=vinhminh2005@gmail.com",
+          "mode": "id"
+        },
+        "options": {
+          "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('After', ``, 'string') }}",
+          "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Before', ``, 'string') }}",
+          "fields": "=items(summary, start(dateTime))"
+        }
+      },
+      "id": "82609081-83de-4866-906c-0e4698b10efb",
+      "name": "Google Calendar",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "position": [
+        7152,
+        3136
+      ],
+      "typeVersion": 1.1,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "zkDR7YWF2VHVgOrO",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Zalo Message Trigger').first().json.message.data.content}}"
+      },
+      "id": "8ea6a0ee-0042-4aa4-b836-bf24dfdfe075",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        5936,
+        3136
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 20,
+        "filters": {
+          "labelIds": [
+            "INBOX",
+            "UNREAD"
+          ],
+          "readStatus": "unread",
+          "receivedAfter": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Received_After', ``, 'string') }}",
+          "receivedBefore": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Received_Before', ``, 'string') }}"
+        }
+      },
+      "id": "61f804ae-568f-4742-8c65-4ac3885bc0c8",
+      "name": "Get Email",
+      "type": "n8n-nodes-base.gmailTool",
+      "position": [
+        6720,
+        3136
+      ],
+      "webhookId": "dd49ea92-17bd-4264-bb94-7936526992e1",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "TIr88HbtOem3QaH9",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fields": {
+          "values": [
+            {
+              "name": "text",
+              "stringValue": "={{ $json?.message?.text || \"\" }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bd83375b-0d53-4844-a588-0e743a0184f7",
+      "name": "Voice or Text",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        5008,
+        2784
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "content": "## Process Telegram Request\n",
+        "height": 279,
+        "width": 624,
+        "color": 7
+      },
+      "id": "5dc6c4ce-d2d4-4359-9c59-dfcb5bac5f64",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        4992,
+        2672
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n1. [In OpenRouter](https://openrouter.ai/settings/keys) click **“Create API key”** and copy it.\n\n2. Open the ```OpenRouter``` node:\n   * **Select Credential → Create New**\n   * Paste into **API Key** and **Save**\n",
+        "height": 316,
+        "width": 294,
+        "color": 3
+      },
+      "id": "3c391816-962d-4a4f-b7a0-a7027c602c77",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        5520,
+        3072
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "2b057c7d-7868-40ad-b07e-73d00ccea0ec",
+      "name": "OpenRouter",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "position": [
+        5616,
+        3232
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\nThis node helps your agent remember the last few messages to stay on topic.",
+        "height": 260,
+        "width": 308,
+        "color": 7
+      },
+      "id": "de0bc89a-37d9-4f6f-a910-b6d6d3a8c2f5",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        5824,
+        3088
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nThis node allows your agent create and get tasks from Google Tasks\n",
+        "height": 260,
+        "width": 484,
+        "color": 7
+      },
+      "id": "8cf7ac67-40de-41eb-b157-238c9f608b90",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        6160,
+        3088
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\nThis node allows your agent access your gmail\n",
+        "height": 260,
+        "width": 308,
+        "color": 7
+      },
+      "id": "50074745-ed89-4d97-98bd-d21b9a5b6f2f",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note18",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        6672,
+        3088
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\nThis node allows your agent access your Google calendar\n",
+        "height": 260,
+        "width": 404,
+        "color": 7
+      },
+      "id": "52f6a66a-9f9a-4fff-b3d4-fa1a03cd0da8",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note19",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        7008,
+        3088
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nUses OpenAI to convert voice to text.\n[In OpenAI](https://platform.openai.com/api-keys) click **“Create new secret key”** and copy it.",
+        "height": 276,
+        "width": 324,
+        "color": 7
+      },
+      "id": "d733a93c-18d4-4efb-bf2f-ea95d23fb282",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note20",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        5680,
+        2672
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "Caylee, your peronal AI Assistant:\n1. Get email\n2. Check calendar\n3. Get and create to-do tasks \n\nEdit the **System Message** to adjust your agent’s thinking, behavior, and replies.\n\n\n\n\n\n\n\n\n\n\n",
+        "height": 380,
+        "width": 396,
+        "color": 7
+      },
+      "id": "df5bb017-305d-45a1-86e3-9c062c26a315",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        6064,
+        2576
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "# Try It Out!\n\nLaunch Jackie—your personal AI assistant that handles voice & text via Telegram to manage your digital life.\n\n**To get started:**\n\n1. **Connect all credentials** (Telegram, OpenAI, Gmail, etc.)\n2. **Activate the workflow** and message your Telegram bot:\n   • \"What emails do I have today?\"\n   • \"Show me my calendar for tomorrow\"\n   • \"Craete new to-do item\"\n   • 🎤 Send voice messages for hands-free interaction\n\n## Questions or Need Help?\n\nFor setup assistance, customization, or workflow support, join my Skool community!\n\n### [AI Automation Engineering Community](https://www.skool.com/ai-automation-engineering-3014)\n\nHappy learning! -- Derek Cheung\n",
+        "height": 568,
+        "width": 460,
+        "color": 4
+      },
+      "id": "8957cdcc-567e-4044-ac8c-8439c01f1fe8",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        4288,
+        2544
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nSend message back to Telegram\n",
+        "height": 288,
+        "width": 304,
+        "color": 7
+      },
+      "id": "73d04f42-a19a-4599-8133-5a56c0c30cca",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        6512,
+        2672
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "task": "MTcwNjY5OTE4OTg0NjU3MDcxMDk6MDow",
+        "title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Title', ``, 'string') }}",
+        "additionalFields": {}
+      },
+      "id": "e5a575d7-1408-4f99-8ac0-29e357163ce9",
+      "name": "Create a task in Google Tasks",
+      "type": "n8n-nodes-base.googleTasksTool",
+      "position": [
+        6096,
+        3152
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googleTasksOAuth2Api": {
+          "id": "MLEkyedxoS1jGrv0",
+          "name": "Google Tasks account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "task": "MTcwNjY5OTE4OTg0NjU3MDcxMDk6MDow",
+        "additionalFields": {}
+      },
+      "id": "b78e179f-ea1c-4b47-b990-97f2f7ea5ebc",
+      "name": "Get many tasks in Google Tasks",
+      "type": "n8n-nodes-base.googleTasksTool",
+      "position": [
+        6256,
+        3136
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googleTasksOAuth2Api": {
+          "id": "MLEkyedxoS1jGrv0",
+          "name": "Google Tasks account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "id": "f0d82de1-4ec5-48c9-98c7-14fcfd674a24",
+      "name": "Transcribe a recording",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        5600,
+        2736
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "833FO5mcRF5PeQv2",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', `Please format this nicely in html`, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "30f082b6-82fd-4e3a-9cd7-718d131c0037",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.gmailTool",
+      "position": [
+        6864,
+        3136
+      ],
+      "webhookId": "0ba317ab-4ac1-4948-a35a-d54baacdff54",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "TIr88HbtOem3QaH9",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.data.content }}",
+        "options": {
+          "systemMessage": "=You are a helpful personal assistant called Jackie. \nToday's date is {{ $today.format('yyyy-MM-dd') }}.\nGuidelines:\n1.general:\n- Use english or vietnamese language only\n- Website's link or newspaper online's link not put in marks like as (http://...) or [http://...] or {http://...}...\n2.email, calendar events...:\n- When summarizing emails, include Sender, Message date, subject, and brief summary of email.\n- if the user did not specify a date in the request assume they are asking for today\n- When answering questions about calendar events, filter out events that don't apply to the question.  For example, the question is about events for today, only reply with events for today. Don't mention future events if it's more than 1 week away\n- When creating calendar entry, the attendee email is optional\n3.Zalo:\nWhen sending a Zalo message:\n- Do NOT use the phone number as Chat ID.\n- Extract the 'threadId' or 'userId' from the incoming message data and pass it to the 'Chat_ID' parameter of the Zalo tool.\n- Pass the message text to the 'Text' parameter.\nMaintain a friendly and professional tone. Respond in Vietnamese unless requested otherwise.\nOnce sent successfully, confirm briefly to the user with the recipient number and the message content sent."
+        }
+      },
+      "id": "c9145fba-edee-43cc-a73d-ccbf2a3607d7",
+      "name": "Jackie, AI Assistant 👩🏻‍🏫",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        6144,
+        2768
+      ],
+      "typeVersion": 1.6
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "dd41bbf0-bee0-450b-9160-b769821a4abc",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $json.message.voice}}",
+                    "rightValue": ""
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Voice"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "id": "8a9be2bb-8253-49b1-b683-d86659a8c43f",
+      "name": "Determine content type",
+      "type": "n8n-nodes-base.switch",
+      "position": [
+        5248,
+        2752
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "a0bf9719-4272-46f6-ab3b-eda6f7b44fd8",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": ""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2ad3aa6c-ed5a-4531-a98d-56d25b8d6265",
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        5296,
+        2608
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        5712,
+        3072
+      ],
+      "id": "cbec9650-168d-46da-b9b7-180ffee23e07",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "833FO5mcRF5PeQv2",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "17ad73bb-86ff-4593-9193-1fa7fca95c8c",
+      "name": "SerpAPI1",
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "position": [
+        6576,
+        3152
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "serpApi": {
+          "id": "ODeFyk7FlG1jNeVY",
+          "name": "SerpApi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        6528,
+        3312
+      ],
+      "id": "2b368e03-bfb4-4156-8c59-84a649dbbf78",
+      "name": "Calculator2"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "14Pjv6UUHEGGZhqYFz4Tufk-A3R_2YbS07fv0U_Z0F98",
+          "mode": "list",
+          "cachedResultName": "Chat Vinh's Family group",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14Pjv6UUHEGGZhqYFz4Tufk-A3R_2YbS07fv0U_Z0F98/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Linbol group",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14Pjv6UUHEGGZhqYFz4Tufk-A3R_2YbS07fv0U_Z0F98/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.threadId }}",
+            "message id": "={{ $json.response.message.msgId }}",
+            "Date": "={{ $now }}",
+            "Chat content": "={{ $('Jackie, AI Assistant 👩🏻‍🏫').item.json.output }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message id",
+              "displayName": "message id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Chat content",
+              "displayName": "Chat content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        7584,
+        2016
+      ],
+      "id": "f509e3d9-3c3e-4e96-8efd-7a0d0d797463",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0tKf9Jmz42JPy4lj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-zalos-user.zaloLoginByQr",
+      "typeVersion": 1,
+      "position": [
+        4400,
+        1984
+      ],
+      "id": "1dfde813-8049-474b-9f54-63567a1a7df7",
+      "name": "Zalo Login Via QR Code",
+      "credentials": {
+        "n8nZaloApi": {
+          "id": "Y827UWy0ME2gSfWL",
+          "name": "n8n Zalo Account Credential account"
+        },
+        "zaloApi": {
+          "id": "qp9nhkC7KlJ5nkIa",
+          "name": "Zalo account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "selfListen": true
+      },
+      "type": "n8n-nodes-zalos-user.zaloMessageTrigger",
+      "typeVersion": 1,
+      "position": [
+        4768,
+        1984
+      ],
+      "id": "ccb405c0-7325-4c81-bfab-37fd43c0e11a",
+      "name": "Zalo Message Trigger",
+      "webhookId": "7bd18a86-732e-499f-bbda-31af6a35d475",
+      "credentials": {
+        "zaloApi": {
+          "id": "TZHEd45BFslMGcZV",
+          "name": "097943..._VinhNguyen... _ 05:56 24/08"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Zalo Send Message": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Jackie, AI Assistant 👩🏻‍🏫",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jackie, AI Assistant 👩🏻‍🏫",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Jackie, AI Assistant 👩🏻‍🏫",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Email": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jackie, AI Assistant 👩🏻‍🏫",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Voice or Text": {
+      "main": [
+        [
+          {
+            "node": "Determine content type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a task in Google Tasks": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jackie, AI Assistant 👩🏻‍🏫",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many tasks in Google Tasks": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jackie, AI Assistant 👩🏻‍🏫",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jackie, AI Assistant 👩🏻‍🏫",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jackie, AI Assistant 👩🏻‍🏫": {
+      "main": [
+        [
+          {
+            "node": "Zalo Send Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine content type": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Jackie, AI Assistant 👩🏻‍🏫",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jackie, AI Assistant 👩🏻‍🏫",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator2": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jackie, AI Assistant 👩🏻‍🏫",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Zalo Message Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": {
+    "node:Zalo Message Trigger": {
+      "isConnected": true,
+      "eventTypes": [
+        0,
+        1
+      ]
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "2c1b36fb-3f3e-41bf-9a85-ba7aef70dfba",
+  "activeVersionId": "2c1b36fb-3f3e-41bf-9a85-ba7aef70dfba",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-08-24T05:24:44.953Z",
+      "createdAt": "2026-08-24T05:24:44.953Z",
+      "role": "workflow:owner",
+      "workflowId": "0Mc9btOFiI6y6LWG",
+      "projectId": "qXi1KgDY8Rs5YRaI"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-08-24T06:32:28.048Z",
+    "createdAt": "2026-08-24T06:32:25.886Z",
+    "versionId": "2c1b36fb-3f3e-41bf-9a85-ba7aef70dfba",
+    "workflowId": "0Mc9btOFiI6y6LWG",
+    "nodes": [
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4o-mini"
+          },
+          "options": {}
+        },
+        "id": "811fe42d-dd77-423f-a7ab-08af9cf6e9a2",
+        "name": "OpenAI Chat Model",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "position": [
+          5952,
+          2288
+        ],
+        "typeVersion": 1.2,
+        "credentials": {
+          "openAiApi": {
+            "id": "833FO5mcRF5PeQv2",
+            "name": "OpenAI account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "id": "74867bf1-2fb7-4272-ad3a-aa9bbe3a389d",
+        "name": "SerpAPI",
+        "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+        "position": [
+          6352,
+          2208
+        ],
+        "typeVersion": 1,
+        "credentials": {
+          "serpApi": {
+            "id": "ODeFyk7FlG1jNeVY",
+            "name": "SerpApi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $json.message.data.content }}",
+          "options": {
+            "systemMessage": "Bạn ta chuyên gia, hãy tư vấn cho khách hàng, trả lời một lần, không lặp lại theo dưới đây:\n- Trường hợp tốt: tin nhắn rõ ràng\n- Trường hợp tệ: tin nhắn không rõ"
+          }
+        },
+        "id": "20ea0fdb-9be1-4ac8-9cd8-79bc7505d878",
+        "name": "AI Agent",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "position": [
+          6112,
+          1984
+        ],
+        "typeVersion": 1.8,
+        "alwaysOutputData": false
+      },
+      {
+        "parameters": {
+          "sessionIdType": "customKey",
+          "sessionKey": "$json.sender.id }}"
+        },
+        "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+        "typeVersion": 1.4,
+        "position": [
+          6096,
+          2224
+        ],
+        "id": "b0dac7d8-37f2-44ee-879d-6baa9a52a2e1",
+        "name": "Simple Memory"
+      },
+      {
+        "parameters": {
+          "threadId": "=7280655782332324476",
+          "type": 1,
+          "message": "={{ $json.output }}",
+          "quote": {},
+          "mentions": {}
+        },
+        "type": "n8n-nodes-zalos-user.zaloSendMessage",
+        "typeVersion": 4,
+        "position": [
+          7376,
+          2016
+        ],
+        "id": "95067e26-5eff-48ce-a554-c3780f134775",
+        "name": "Zalo Send Message",
+        "credentials": {
+          "zaloApi": {
+            "id": "TZHEd45BFslMGcZV",
+            "name": "097943..._VinhNguyen... _ 05:56 24/08"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "319a56f3-cefa-4119-881e-9480d79853a8",
+                "leftValue": "={{ $json.message.data.uidFrom }}",
+                "rightValue": "=564720991332328608",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEquals"
+                }
+              },
+              {
+                "id": "4018db8c-fdfe-45d0-ab47-559316b9d23c",
+                "leftValue": "={{ $json.message.data.idTo }}",
+                "rightValue": "7280655782332324476",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals",
+                  "name": "filter.operator.equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": "={{ false }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          5264,
+          1984
+        ],
+        "id": "70dd6346-b747-4264-9d79-bf1ac7c0368c",
+        "name": "If"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          5472,
+          2272
+        ],
+        "id": "634178e2-7d90-44e6-8095-94553ebc9fd9",
+        "name": "No Operation, do nothing"
+      },
+      {
+        "parameters": {},
+        "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+        "typeVersion": 1,
+        "position": [
+          6144,
+          2368
+        ],
+        "id": "7eb3cac1-c138-4203-b123-3bf8664c629e",
+        "name": "Calculator"
+      },
+      {
+        "parameters": {},
+        "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+        "typeVersion": 1,
+        "position": [
+          6256,
+          2256
+        ],
+        "id": "91795971-f990-4467-9963-5d81626eb374",
+        "name": "Calculator1"
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "calendar": {
+            "__rl": true,
+            "value": "=vinhminh2005@gmail.com",
+            "mode": "id"
+          },
+          "options": {
+            "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('After', ``, 'string') }}",
+            "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Before', ``, 'string') }}",
+            "fields": "=items(summary, start(dateTime))"
+          }
+        },
+        "id": "82609081-83de-4866-906c-0e4698b10efb",
+        "name": "Google Calendar",
+        "type": "n8n-nodes-base.googleCalendarTool",
+        "position": [
+          7152,
+          3136
+        ],
+        "typeVersion": 1.1,
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "zkDR7YWF2VHVgOrO",
+            "name": "Google Calendar account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "sessionIdType": "customKey",
+          "sessionKey": "={{ $('Zalo Message Trigger').first().json.message.data.content}}"
+        },
+        "id": "8ea6a0ee-0042-4aa4-b836-bf24dfdfe075",
+        "name": "Window Buffer Memory",
+        "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+        "position": [
+          5936,
+          3136
+        ],
+        "typeVersion": 1.2
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "limit": 20,
+          "filters": {
+            "labelIds": [
+              "INBOX",
+              "UNREAD"
+            ],
+            "readStatus": "unread",
+            "receivedAfter": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Received_After', ``, 'string') }}",
+            "receivedBefore": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Received_Before', ``, 'string') }}"
+          }
+        },
+        "id": "61f804ae-568f-4742-8c65-4ac3885bc0c8",
+        "name": "Get Email",
+        "type": "n8n-nodes-base.gmailTool",
+        "position": [
+          6720,
+          3136
+        ],
+        "webhookId": "dd49ea92-17bd-4264-bb94-7936526992e1",
+        "typeVersion": 2.1,
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "TIr88HbtOem3QaH9",
+            "name": "Gmail account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "fields": {
+            "values": [
+              {
+                "name": "text",
+                "stringValue": "={{ $json?.message?.text || \"\" }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "bd83375b-0d53-4844-a588-0e743a0184f7",
+        "name": "Voice or Text",
+        "type": "n8n-nodes-base.set",
+        "position": [
+          5008,
+          2784
+        ],
+        "typeVersion": 3.2
+      },
+      {
+        "parameters": {
+          "content": "## Process Telegram Request\n",
+          "height": 279,
+          "width": 624,
+          "color": 7
+        },
+        "id": "5dc6c4ce-d2d4-4359-9c59-dfcb5bac5f64",
+        "name": "Sticky Note",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          4992,
+          2672
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "content": "\n\n\n\n\n\n\n\n\n\n\n\n1. [In OpenRouter](https://openrouter.ai/settings/keys) click **“Create API key”** and copy it.\n\n2. Open the ```OpenRouter``` node:\n   * **Select Credential → Create New**\n   * Paste into **API Key** and **Save**\n",
+          "height": 316,
+          "width": 294,
+          "color": 3
+        },
+        "id": "3c391816-962d-4a4f-b7a0-a7027c602c77",
+        "cid": "Ikx1Y2FzIFBleXJpbiI",
+        "name": "Sticky Note1",
+        "type": "n8n-nodes-base.stickyNote",
+        "creator": "Lucas Peyrin",
+        "position": [
+          5520,
+          3072
+        ],
+        "typeVersion": 1,
+        "notes": "© 2025 Lucas Peyrin"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "id": "2b057c7d-7868-40ad-b07e-73d00ccea0ec",
+        "name": "OpenRouter",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+        "position": [
+          5616,
+          3232
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\nThis node helps your agent remember the last few messages to stay on topic.",
+          "height": 260,
+          "width": 308,
+          "color": 7
+        },
+        "id": "de0bc89a-37d9-4f6f-a910-b6d6d3a8c2f5",
+        "cid": "Ikx1Y2FzIFBleXJpbiI",
+        "name": "Sticky Note15",
+        "type": "n8n-nodes-base.stickyNote",
+        "creator": "Lucas Peyrin",
+        "position": [
+          5824,
+          3088
+        ],
+        "typeVersion": 1,
+        "notes": "© 2025 Lucas Peyrin"
+      },
+      {
+        "parameters": {
+          "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nThis node allows your agent create and get tasks from Google Tasks\n",
+          "height": 260,
+          "width": 484,
+          "color": 7
+        },
+        "id": "8cf7ac67-40de-41eb-b157-238c9f608b90",
+        "cid": "Ikx1Y2FzIFBleXJpbiI",
+        "name": "Sticky Note16",
+        "type": "n8n-nodes-base.stickyNote",
+        "creator": "Lucas Peyrin",
+        "position": [
+          6160,
+          3088
+        ],
+        "typeVersion": 1,
+        "notes": "© 2025 Lucas Peyrin"
+      },
+      {
+        "parameters": {
+          "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\nThis node allows your agent access your gmail\n",
+          "height": 260,
+          "width": 308,
+          "color": 7
+        },
+        "id": "50074745-ed89-4d97-98bd-d21b9a5b6f2f",
+        "cid": "Ikx1Y2FzIFBleXJpbiI",
+        "name": "Sticky Note18",
+        "type": "n8n-nodes-base.stickyNote",
+        "creator": "Lucas Peyrin",
+        "position": [
+          6672,
+          3088
+        ],
+        "typeVersion": 1,
+        "notes": "© 2025 Lucas Peyrin"
+      },
+      {
+        "parameters": {
+          "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\nThis node allows your agent access your Google calendar\n",
+          "height": 260,
+          "width": 404,
+          "color": 7
+        },
+        "id": "52f6a66a-9f9a-4fff-b3d4-fa1a03cd0da8",
+        "cid": "Ikx1Y2FzIFBleXJpbiI",
+        "name": "Sticky Note19",
+        "type": "n8n-nodes-base.stickyNote",
+        "creator": "Lucas Peyrin",
+        "position": [
+          7008,
+          3088
+        ],
+        "typeVersion": 1,
+        "notes": "© 2025 Lucas Peyrin"
+      },
+      {
+        "parameters": {
+          "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nUses OpenAI to convert voice to text.\n[In OpenAI](https://platform.openai.com/api-keys) click **“Create new secret key”** and copy it.",
+          "height": 276,
+          "width": 324,
+          "color": 7
+        },
+        "id": "d733a93c-18d4-4efb-bf2f-ea95d23fb282",
+        "cid": "Ikx1Y2FzIFBleXJpbiI",
+        "name": "Sticky Note20",
+        "type": "n8n-nodes-base.stickyNote",
+        "creator": "Lucas Peyrin",
+        "position": [
+          5680,
+          2672
+        ],
+        "typeVersion": 1,
+        "notes": "© 2025 Lucas Peyrin"
+      },
+      {
+        "parameters": {
+          "content": "Caylee, your peronal AI Assistant:\n1. Get email\n2. Check calendar\n3. Get and create to-do tasks \n\nEdit the **System Message** to adjust your agent’s thinking, behavior, and replies.\n\n\n\n\n\n\n\n\n\n\n",
+          "height": 380,
+          "width": 396,
+          "color": 7
+        },
+        "id": "df5bb017-305d-45a1-86e3-9c062c26a315",
+        "cid": "Ikx1Y2FzIFBleXJpbiI",
+        "name": "Sticky Note13",
+        "type": "n8n-nodes-base.stickyNote",
+        "creator": "Lucas Peyrin",
+        "position": [
+          6064,
+          2576
+        ],
+        "typeVersion": 1,
+        "notes": "© 2025 Lucas Peyrin"
+      },
+      {
+        "parameters": {
+          "content": "# Try It Out!\n\nLaunch Jackie—your personal AI assistant that handles voice & text via Telegram to manage your digital life.\n\n**To get started:**\n\n1. **Connect all credentials** (Telegram, OpenAI, Gmail, etc.)\n2. **Activate the workflow** and message your Telegram bot:\n   • \"What emails do I have today?\"\n   • \"Show me my calendar for tomorrow\"\n   • \"Craete new to-do item\"\n   • 🎤 Send voice messages for hands-free interaction\n\n## Questions or Need Help?\n\nFor setup assistance, customization, or workflow support, join my Skool community!\n\n### [AI Automation Engineering Community](https://www.skool.com/ai-automation-engineering-3014)\n\nHappy learning! -- Derek Cheung\n",
+          "height": 568,
+          "width": 460,
+          "color": 4
+        },
+        "id": "8957cdcc-567e-4044-ac8c-8439c01f1fe8",
+        "name": "Sticky Note3",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          4288,
+          2544
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nSend message back to Telegram\n",
+          "height": 288,
+          "width": 304,
+          "color": 7
+        },
+        "id": "73d04f42-a19a-4599-8133-5a56c0c30cca",
+        "name": "Sticky Note4",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          6512,
+          2672
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "task": "MTcwNjY5OTE4OTg0NjU3MDcxMDk6MDow",
+          "title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Title', ``, 'string') }}",
+          "additionalFields": {}
+        },
+        "id": "e5a575d7-1408-4f99-8ac0-29e357163ce9",
+        "name": "Create a task in Google Tasks",
+        "type": "n8n-nodes-base.googleTasksTool",
+        "position": [
+          6096,
+          3152
+        ],
+        "typeVersion": 1,
+        "credentials": {
+          "googleTasksOAuth2Api": {
+            "id": "MLEkyedxoS1jGrv0",
+            "name": "Google Tasks account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "task": "MTcwNjY5OTE4OTg0NjU3MDcxMDk6MDow",
+          "additionalFields": {}
+        },
+        "id": "b78e179f-ea1c-4b47-b990-97f2f7ea5ebc",
+        "name": "Get many tasks in Google Tasks",
+        "type": "n8n-nodes-base.googleTasksTool",
+        "position": [
+          6256,
+          3136
+        ],
+        "typeVersion": 1,
+        "credentials": {
+          "googleTasksOAuth2Api": {
+            "id": "MLEkyedxoS1jGrv0",
+            "name": "Google Tasks account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "audio",
+          "operation": "transcribe",
+          "options": {}
+        },
+        "id": "f0d82de1-4ec5-48c9-98c7-14fcfd674a24",
+        "name": "Transcribe a recording",
+        "type": "@n8n/n8n-nodes-langchain.openAi",
+        "position": [
+          5600,
+          2736
+        ],
+        "typeVersion": 1.8,
+        "credentials": {
+          "openAiApi": {
+            "id": "833FO5mcRF5PeQv2",
+            "name": "OpenAI account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+          "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+          "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', `Please format this nicely in html`, 'string') }}",
+          "options": {
+            "appendAttribution": false
+          }
+        },
+        "id": "30f082b6-82fd-4e3a-9cd7-718d131c0037",
+        "name": "Send Email",
+        "type": "n8n-nodes-base.gmailTool",
+        "position": [
+          6864,
+          3136
+        ],
+        "webhookId": "0ba317ab-4ac1-4948-a35a-d54baacdff54",
+        "typeVersion": 2.1,
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "TIr88HbtOem3QaH9",
+            "name": "Gmail account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $json.message.data.content }}",
+          "options": {
+            "systemMessage": "=You are a helpful personal assistant called Jackie. \nToday's date is {{ $today.format('yyyy-MM-dd') }}.\nGuidelines:\n1.general:\n- Use english or vietnamese language only\n- Website's link or newspaper online's link not put in marks like as (http://...) or [http://...] or {http://...}...\n2.email, calendar events...:\n- When summarizing emails, include Sender, Message date, subject, and brief summary of email.\n- if the user did not specify a date in the request assume they are asking for today\n- When answering questions about calendar events, filter out events that don't apply to the question.  For example, the question is about events for today, only reply with events for today. Don't mention future events if it's more than 1 week away\n- When creating calendar entry, the attendee email is optional\n3.Zalo:\nWhen sending a Zalo message:\n- Do NOT use the phone number as Chat ID.\n- Extract the 'threadId' or 'userId' from the incoming message data and pass it to the 'Chat_ID' parameter of the Zalo tool.\n- Pass the message text to the 'Text' parameter.\nMaintain a friendly and professional tone. Respond in Vietnamese unless requested otherwise.\nOnce sent successfully, confirm briefly to the user with the recipient number and the message content sent."
+          }
+        },
+        "id": "c9145fba-edee-43cc-a73d-ccbf2a3607d7",
+        "name": "Jackie, AI Assistant 👩🏻‍🏫",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "position": [
+          6144,
+          2768
+        ],
+        "typeVersion": 1.6
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "combinator": "and",
+                  "conditions": [
+                    {
+                      "operator": {
+                        "type": "string",
+                        "operation": "notEmpty",
+                        "singleValue": true
+                      },
+                      "leftValue": "={{ $json.message.text }}",
+                      "rightValue": "/"
+                    }
+                  ]
+                },
+                "renameOutput": true,
+                "outputKey": "Text"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "combinator": "and",
+                  "conditions": [
+                    {
+                      "id": "dd41bbf0-bee0-450b-9160-b769821a4abc",
+                      "operator": {
+                        "type": "object",
+                        "operation": "exists",
+                        "singleValue": true
+                      },
+                      "leftValue": "={{ $json.message.voice}}",
+                      "rightValue": ""
+                    }
+                  ]
+                },
+                "renameOutput": true,
+                "outputKey": "Voice"
+              }
+            ]
+          },
+          "options": {
+            "fallbackOutput": "extra"
+          }
+        },
+        "id": "8a9be2bb-8253-49b1-b683-d86659a8c43f",
+        "name": "Determine content type",
+        "type": "n8n-nodes-base.switch",
+        "position": [
+          5248,
+          2752
+        ],
+        "typeVersion": 3.2
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "a0bf9719-4272-46f6-ab3b-eda6f7b44fd8",
+                "operator": {
+                  "type": "string",
+                  "operation": "empty",
+                  "singleValue": true
+                },
+                "leftValue": "={{ $json.message.text }}",
+                "rightValue": ""
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "2ad3aa6c-ed5a-4531-a98d-56d25b8d6265",
+        "name": "If1",
+        "type": "n8n-nodes-base.if",
+        "position": [
+          5296,
+          2608
+        ],
+        "typeVersion": 2.2
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "value": "gpt-4o-mini",
+            "mode": "list",
+            "cachedResultName": "gpt-4o-mini"
+          },
+          "responsesApiEnabled": false,
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.3,
+        "position": [
+          5712,
+          3072
+        ],
+        "id": "cbec9650-168d-46da-b9b7-180ffee23e07",
+        "name": "OpenAI Chat Model1",
+        "credentials": {
+          "openAiApi": {
+            "id": "833FO5mcRF5PeQv2",
+            "name": "OpenAI account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "id": "17ad73bb-86ff-4593-9193-1fa7fca95c8c",
+        "name": "SerpAPI1",
+        "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+        "position": [
+          6576,
+          3152
+        ],
+        "typeVersion": 1,
+        "credentials": {
+          "serpApi": {
+            "id": "ODeFyk7FlG1jNeVY",
+            "name": "SerpApi account"
+          }
+        }
+      },
+      {
+        "parameters": {},
+        "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+        "typeVersion": 1,
+        "position": [
+          6528,
+          3312
+        ],
+        "id": "2b368e03-bfb4-4156-8c59-84a649dbbf78",
+        "name": "Calculator2"
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "14Pjv6UUHEGGZhqYFz4Tufk-A3R_2YbS07fv0U_Z0F98",
+            "mode": "list",
+            "cachedResultName": "Chat Vinh's Family group",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14Pjv6UUHEGGZhqYFz4Tufk-A3R_2YbS07fv0U_Z0F98/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Linbol group",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14Pjv6UUHEGGZhqYFz4Tufk-A3R_2YbS07fv0U_Z0F98/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "id": "={{ $json.threadId }}",
+              "message id": "={{ $json.response.message.msgId }}",
+              "Date": "={{ $now }}",
+              "Chat content": "={{ $('Jackie, AI Assistant 👩🏻‍🏫').item.json.output }}"
+            },
+            "matchingColumns": [
+              "id"
+            ],
+            "schema": [
+              {
+                "id": "id",
+                "displayName": "id",
+                "required": false,
+                "defaultMatch": true,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "message id",
+                "displayName": "message id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Chat content",
+                "displayName": "Chat content",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Date",
+                "displayName": "Date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          7584,
+          2016
+        ],
+        "id": "f509e3d9-3c3e-4e96-8efd-7a0d0d797463",
+        "name": "Append row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0tKf9Jmz42JPy4lj",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-zalos-user.zaloLoginByQr",
+        "typeVersion": 1,
+        "position": [
+          4400,
+          1984
+        ],
+        "id": "1dfde813-8049-474b-9f54-63567a1a7df7",
+        "name": "Zalo Login Via QR Code",
+        "credentials": {
+          "n8nZaloApi": {
+            "id": "Y827UWy0ME2gSfWL",
+            "name": "n8n Zalo Account Credential account"
+          },
+          "zaloApi": {
+            "id": "qp9nhkC7KlJ5nkIa",
+            "name": "Zalo account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "selfListen": true
+        },
+        "type": "n8n-nodes-zalos-user.zaloMessageTrigger",
+        "typeVersion": 1,
+        "position": [
+          4768,
+          1984
+        ],
+        "id": "ccb405c0-7325-4c81-bfab-37fd43c0e11a",
+        "name": "Zalo Message Trigger",
+        "webhookId": "7bd18a86-732e-499f-bbda-31af6a35d475",
+        "credentials": {
+          "zaloApi": {
+            "id": "TZHEd45BFslMGcZV",
+            "name": "097943..._VinhNguyen... _ 05:56 24/08"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "SerpAPI": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Simple Memory": {
+        "ai_memory": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Zalo Send Message": {
+        "main": [
+          [
+            {
+              "node": "Append row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Jackie, AI Assistant 👩🏻‍🏫",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "No Operation, do nothing",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Calculator": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Calculator1": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Google Calendar": {
+        "ai_tool": [
+          [
+            {
+              "node": "Jackie, AI Assistant 👩🏻‍🏫",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Window Buffer Memory": {
+        "ai_memory": [
+          [
+            {
+              "node": "Jackie, AI Assistant 👩🏻‍🏫",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Email": {
+        "ai_tool": [
+          [
+            {
+              "node": "Jackie, AI Assistant 👩🏻‍🏫",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Voice or Text": {
+        "main": [
+          [
+            {
+              "node": "Determine content type",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create a task in Google Tasks": {
+        "ai_tool": [
+          [
+            {
+              "node": "Jackie, AI Assistant 👩🏻‍🏫",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get many tasks in Google Tasks": {
+        "ai_tool": [
+          [
+            {
+              "node": "Jackie, AI Assistant 👩🏻‍🏫",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send Email": {
+        "ai_tool": [
+          [
+            {
+              "node": "Jackie, AI Assistant 👩🏻‍🏫",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Jackie, AI Assistant 👩🏻‍🏫": {
+        "main": [
+          [
+            {
+              "node": "Zalo Send Message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Determine content type": {
+        "main": [
+          [],
+          [
+            {
+              "node": "Transcribe a recording",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          []
+        ]
+      },
+      "OpenAI Chat Model1": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Jackie, AI Assistant 👩🏻‍🏫",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "SerpAPI1": {
+        "ai_tool": [
+          [
+            {
+              "node": "Jackie, AI Assistant 👩🏻‍🏫",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Calculator2": {
+        "ai_tool": [
+          [
+            {
+              "node": "Jackie, AI Assistant 👩🏻‍🏫",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Zalo Message Trigger": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Nguyen Vinh",
+    "name": "Version 2c1b36fb",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
