@@ -1,0 +1,251 @@
+{
+  "updatedAt": "2026-08-24T15:58:25.551Z",
+  "createdAt": "2026-08-24T15:52:11.948Z",
+  "id": "PI19ImIQ3TWcpoZr",
+  "name": "Automatically add Gmail sender contacts to MySQL database-repaired",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## This workflow processes emails received in Gmail and adds the sender's **name** and **email address** to a MySQL database.\n\n## Use Cases:\n- A sales or marketing agency can use this to automatically save client contact info to a database to build a list of leads\n- Companies can use this to automatically save contacts to a database in case of Gmail data loss / losing access to their Gmail account\n- Companies can build mailing lists to automatically send promotions to all of the clients who have contacted them in a given time period\n\n## Before using, you need to have:\n- Gmail credential\n- MySQL database credential\n- A Table in the MySQL database to store your contacts\n- The table should have a \"name\" column, which allows NULL values\n- The table should have an \"email\" column, which should be UNIQUE\n\n## How it works:\n- The Gmail Trigger will listen for a new email every minute\n- For each email, the code node will extract the name and email address of the sender. If there is no name, it will return null\n- The MySQL node will insert the new contact into a table in your database\n- If the contact email already exists in your database, the MySQL node will update the contact name\n\n\n## How to use:\n- Please set up the MySQL node by selecting the correct table to store contacts in\n- Please choose your \"email\" column to match on\n- Please choose your \"name\" column to store names\n",
+        "height": 1480
+      },
+      "id": "c6250c78-41e1-4977-8f3b-d34a76a24f82",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        368,
+        240
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Please setup this node first\n- Create a table in your MySQL database to store your contacts.\n- The table should include the following fields\n  - Name column (should allow null values)\n  - Email column (should be set to unique)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n## How to use:\n- Please set up the MySQL node by selecting the correct table to store contacts in\n- Please choose your \"email\" column to match on\n- Please choose your \"name\" column to store names",
+        "height": 680,
+        "width": 300
+      },
+      "id": "3688fcda-44ad-47c1-bc76-3f3fa04ca436",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1200,
+        512
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "contacts",
+          "cachedResultName": "contacts"
+        },
+        "dataMode": "defineBelow",
+        "columnToMatchOn": "email",
+        "valueToMatchOn": "={{ $json.email }}",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "name",
+              "value": "={{ $json.name }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1cbe3946-6b48-483e-9983-2f0c3f243c40",
+      "name": "Insert New Client in MySQL",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        1280,
+        784
+      ],
+      "typeVersion": 2.4,
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "qUDdpM5e3UFFzPDj",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "id": "ff005111-3172-4022-92b1-9280458d6741",
+      "name": "Receive Email",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "position": [
+        736,
+        784
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "TIr88HbtOem3QaH9",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "let email = $json.From.trim();\nlet name = null;\n\nif (email.includes('<')) {\n  name = email.split('<')[0].trim();\n  email = email.split('<')[1].replace('>', '').trim();\n}\n\nreturn {\n  \"name\": name,\n  \"email\": email\n}"
+      },
+      "id": "5a266f76-1c4d-48ed-a50b-65998cfe135c",
+      "name": "Extract Client Name and Email",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        992,
+        784
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "## Customize this to your liking\n\nYou can add filters to this node to only save certain contact emails\n\n**Example:** You can add a \"Label\" filter to only add emails with a specific label",
+        "height": 460,
+        "color": 5
+      },
+      "id": "0b4cf2a9-e890-4561-a6c5-e0c85838a777",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        672,
+        512
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Customizing this Workflow:\n- You can customize this workflow to save more data to MySQL. Here are some examples:\n- In the MySQL node, click \"Add Value\", and choose one of the fields from the Gmail node to save in your database column. You can try saving the following items:\n  - Subject line\n  - MessageID\n  - ThreadID\n  - Snippet\n  - Recipient Info",
+        "height": 420,
+        "color": 5
+      },
+      "id": "58e5e9bd-3bf7-4c3a-80be-c4ac2ff0f370",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1520,
+        560
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE contacts (\n    id INT AUTO_INCREMENT PRIMARY KEY,\n    name VARCHAR(255) NULL,\n    email VARCHAR(255) NOT NULL UNIQUE\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        1200,
+        336
+      ],
+      "id": "8978c6c2-409c-41f7-a760-49f7bcd49de8",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "mySql": {
+          "id": "qUDdpM5e3UFFzPDj",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM contacts;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        1488,
+        784
+      ],
+      "id": "0cc67f98-1eca-404d-92fd-8b046eebe0b8",
+      "name": "Execute a SQL query1",
+      "credentials": {
+        "mySql": {
+          "id": "qUDdpM5e3UFFzPDj",
+          "name": "MySQL account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Receive Email": {
+      "main": [
+        [
+          {
+            "node": "Extract Client Name and Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Client Name and Email": {
+      "main": [
+        [
+          {
+            "node": "Insert New Client in MySQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert New Client in MySQL": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateId": "6300",
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "d3522713-672f-470c-b9e8-aded187f7ca1",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-08-24T15:52:11.948Z",
+      "createdAt": "2026-08-24T15:52:11.948Z",
+      "role": "workflow:owner",
+      "workflowId": "PI19ImIQ3TWcpoZr",
+      "projectId": "qXi1KgDY8Rs5YRaI"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
