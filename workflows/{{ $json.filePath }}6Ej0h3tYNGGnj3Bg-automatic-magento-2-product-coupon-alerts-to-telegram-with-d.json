@@ -1,0 +1,853 @@
+{
+  "updatedAt": "2026-08-24T15:26:14.445Z",
+  "createdAt": "2026-08-24T15:22:46.629Z",
+  "id": "6Ej0h3tYNGGnj3Bg",
+  "name": "Automatic Magento 2 product & coupon alerts to Telegram with duplicate protection",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "0eacaccd-7ca0-493b-bcf6-60758b3b0f5e",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        448,
+        304
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "url": "=https://magekwik.com/rest/V1/salesRules/{{ $json.item_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "b77cb27a-f72f-4e79-af4d-c128375b6aef",
+      "name": "Get Rule Info",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1648,
+        608
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "90c39652-acba-47a2-beff-494cd117b13c",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.is_active }}",
+              "rightValue": "={{ $json.is_active }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "29b72aef-59f5-45f5-b81f-bb383b8817a7",
+      "name": "Coupon Status",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1840,
+        608
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.coupon }}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "28dce2fb-11e4-4c4a-845c-17d68c857130",
+      "name": "Post to Telegram1",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        2400,
+        592
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendMediaGroup",
+        "media": {
+          "media": [
+            {
+              "media": "={{ $json.image }}",
+              "additionalFields": {
+                "caption": "={{ $json.message }}"
+              }
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "id": "d1d70202-6b0e-4ce4-9820-c94109c758ad",
+      "name": "Product Alert to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        2400,
+        784
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS posted_items (item_id INT PRIMARY KEY, item_type ENUM('product', 'coupon') NOT NULL, item_value VARCHAR(255), posted BOOLEAN DEFAULT FALSE, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP);",
+        "options": {}
+      },
+      "id": "693d5ef4-0776-4401-97ff-bb49378a8c77",
+      "name": "Init Database",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        896,
+        304
+      ],
+      "typeVersion": 2.4,
+      "credentials": {
+        "mySql": {
+          "id": "",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "url": "={{$vars.STORE}}rest/V1/products?searchCriteria[sortOrders][0][field]=created_at&searchCriteria[sortOrders][0][direction]=DESC",
+        "allowUnauthorizedCerts": true,
+        "options": {}
+      },
+      "id": "99ebf843-ecf6-46da-9f5b-fbbc242db19b",
+      "name": "Fetch New Product",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1056,
+        864
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://your-website.com/rest/default/V1/products/{{ $json.item_value }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "f8b54b91-b743-4d3b-9637-2f769b46a48b",
+      "name": "Get Product Info",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1648,
+        864
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE posted_items set posted = 1 WHERE item_id = {{ $('Get Latest Offer').item.json.items[0].rule_id }} AND item_type = 'coupon';",
+        "options": {}
+      },
+      "id": "ef85ab97-027b-4fdd-b79c-c38b2795707e",
+      "name": "Set Coupon as Posted",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        2672,
+        608
+      ],
+      "typeVersion": 2.4,
+      "credentials": {
+        "mySql": {
+          "id": "",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE posted_items set posted = 1 WHERE item_id = {{ $('Product Status').item.json.id }} AND item_type = 'product';",
+        "options": {}
+      },
+      "id": "6716f687-198b-4cff-8212-9e6789d597f9",
+      "name": "Set Product as Posted",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        2672,
+        848
+      ],
+      "typeVersion": 2.4,
+      "credentials": {
+        "mySql": {
+          "id": "",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{$vars.STORE}}/rest/V1/coupons/search?searchCriteria[sortOrders][0][field]=created_at&searchCriteria[sortOrders][0][direction]=DESC&searchCriteria[pageSize]=1",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "347f5828-f6f9-4d0e-9771-e9b3884c9a27",
+      "name": "Get Latest Offer",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1056,
+        608
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const product =  $input.first().json\n\nconst message = `🛙 New Product Alert!\\n\\n*${product.name}*\\nPrice: $${product.price}\\n\\nCheck it out now:\\nhttps://magekwik.com/${product.custom_attributes[2].value}`;\n\nreturn [{\n  json: {\n    message,\n    image: product.media_gallery_entries?.[0]?.file\n      ? `https://magekwik.com/pub/media/catalog/product${product.media_gallery_entries[0].file}`\n      : null,\n  }\n}];"
+      },
+      "id": "4fcb066a-f4c8-4449-86d8-6f39513994ab",
+      "name": "Product Message Format",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2096,
+        864
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst coupon = `🎁 New Coupon Alert! 🎁\\n\n🎟️ <b>Coupon Code</b>: ${$('Get Latest Offer').first().json.items[0].code}\n🔄 Usage: ${$('Get Rule Info').first().json.times_used || 0}/${$('Get Rule Info').first().json.uses_per_customer || '∞'}\n✅ Status: ${$('Get Rule Info').first().json.is_active ? 'ACTIVE ✅' : 'INACTIVE ❌'}`\n\nreturn [{\n  json: {\n    coupon\n  }\n}];"
+      },
+      "id": "44e6392f-80b1-4a2b-8081-c0004ed3e0fa",
+      "name": "Voucher Message Format",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2096,
+        608
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET @coupon_id = '{{ $json.items[0].coupon_id }}';\nSET @search_coupon = '{{ $json.items[0].code }}';\n\nINSERT INTO posted_items (\n    item_id, \n    item_type,\n    item_value,\n    posted, \n    updated_at\n)\nSELECT \n    @coupon_id AS item_id,\n    'coupon' AS item_type,\n    @search_coupon AS item_value,\n    FALSE AS posted,\n    CURRENT_TIMESTAMP AS updated_at\nFROM dual\nWHERE NOT EXISTS (\n    SELECT 1 \n    FROM posted_items \n    WHERE item_id = @coupon_id AND item_type = 'coupon'\n);\n\nSELECT * \nFROM posted_items \nWHERE item_id = @coupon_id AND item_type = 'coupon'",
+        "options": {}
+      },
+      "id": "0bf1f58c-1b8d-43eb-a110-121e94d7e44a",
+      "name": "New Voucher Entry",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        1248,
+        608
+      ],
+      "notesInFlow": false,
+      "typeVersion": 2.4,
+      "alwaysOutputData": false,
+      "credentials": {
+        "mySql": {
+          "id": "",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SET @product_id = '{{ $json.items[0].id }}';\nSET @product_sku = '{{ $json.items[0].sku }}';\n\nINSERT INTO posted_items (\n    item_id, \n    item_type,\n    item_value,\n    posted, \n    updated_at\n)\nSELECT \n    @product_id AS item_id,\n    'product' AS item_type,\n    @product_sku AS item_value,\n    FALSE AS posted,\n    CURRENT_TIMESTAMP AS updated_at\nFROM dual\nWHERE NOT EXISTS (\n    SELECT 1 \n    FROM posted_items \n    WHERE item_id = @product_id AND item_type = 'product'\n);\n\nSELECT * \nFROM posted_items \nWHERE item_id = @product_id AND item_type = 'product'",
+        "options": {}
+      },
+      "id": "d060693e-aed5-40cf-9a36-28bf84d96925",
+      "name": "New Product Entry",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        1248,
+        864
+      ],
+      "notesInFlow": false,
+      "typeVersion": 2.4,
+      "alwaysOutputData": false,
+      "credentials": {
+        "mySql": {
+          "id": "",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "90c39652-acba-47a2-beff-494cd117b13c",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "={{ $json.is_active }}"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "ad3f87a5-a37a-4672-984b-5b8a510ea6a4",
+      "name": "Product Status",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1840,
+        864
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.coupon }}",
+        "additionalFields": {}
+      },
+      "id": "dceda5b3-9126-453b-bd6e-01f5ddbc8a60",
+      "name": "Voucher to X",
+      "type": "n8n-nodes-base.twitter",
+      "position": [
+        2400,
+        400
+      ],
+      "typeVersion": 2,
+      "alwaysOutputData": true,
+      "disabled": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.image }}\n\n{{ $json.message }}",
+        "additionalFields": {}
+      },
+      "id": "17e427ed-77f5-4d3c-a6cf-8937f955b9c0",
+      "name": "Product X Post",
+      "type": "n8n-nodes-base.twitter",
+      "position": [
+        2400,
+        1008
+      ],
+      "typeVersion": 2,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "90c39652-acba-47a2-beff-494cd117b13c",
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $json.posted }}",
+              "rightValue": 1
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "70972854-d872-4665-8971-217494646726",
+      "name": "Voucher Duplication Protection",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1456,
+        608
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "or",
+          "conditions": [
+            {
+              "id": "90c39652-acba-47a2-beff-494cd117b13c",
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $json.posted }}",
+              "rightValue": 1
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "c3c88742-1e58-483d-95ee-4fef4fb69104",
+      "name": "Product Duplication Protection",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1456,
+        864
+      ],
+      "typeVersion": 2.2,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "content": "\n## Post to X & Telegram",
+        "height": 820,
+        "width": 260,
+        "color": 4
+      },
+      "id": "458acf57-b472-4d4f-a609-4e9d2737c506",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2320,
+        352
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Record as Posted ",
+        "height": 480,
+        "width": 220,
+        "color": 3
+      },
+      "id": "63f50109-8206-4da5-9429-46e89ef651aa",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2608,
+        528
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Auto Schedule Trigger & Initialise DB",
+        "height": 240,
+        "width": 700,
+        "color": 7
+      },
+      "id": "769d34f1-5b3a-41ff-8dc6-9a658eccd52f",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        368,
+        240
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Format Messages",
+        "height": 500,
+        "color": 6
+      },
+      "id": "d37f209e-5fa7-46be-8e72-5d1c3757be59",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2032,
+        528
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "                    ## Magento 2 - Checks for Latest Voucher - Record in Database - Validates",
+        "height": 240,
+        "width": 1040,
+        "color": 5
+      },
+      "id": "c9c618af-1ba3-4c82-a629-8cf0b1a84c9f",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        976,
+        528
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "                          ## Magento 2 - Checks for New Product - Record in Database - Validates",
+        "height": 240,
+        "width": 1040,
+        "color": 5
+      },
+      "id": "d9399795-e4ff-4590-bd37-3901beb1aee5",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        976,
+        784
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Magento 2 (Adobe Commerce): Automated X & Telegram Posting for New Products and Vouchers \n\n## - This Automation Comes with Duplicate Prevention",
+        "height": 240,
+        "width": 660
+      },
+      "id": "1d1624e4-cdc1-4b50-886d-cefc118259cf",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1088,
+        240
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SHOW TABLES;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        1104,
+        304
+      ],
+      "id": "9d44eb91-9c91-4794-854e-e9ac012a4172",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "mySql": {
+          "id": "",
+          "name": "MySQL account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Voucher to X": {
+      "main": [
+        [
+          {
+            "node": "Set Coupon as Posted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Coupon Status": {
+      "main": [
+        [
+          {
+            "node": "Voucher Message Format",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Rule Info": {
+      "main": [
+        [
+          {
+            "node": "Coupon Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Product Status": {
+      "main": [
+        [
+          {
+            "node": "Product Message Format",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Product X Post": {
+      "main": [
+        [
+          {
+            "node": "Set Product as Posted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Latest Offer": {
+      "main": [
+        [
+          {
+            "node": "New Voucher Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Product Info": {
+      "main": [
+        [
+          {
+            "node": "Product Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Latest Offer",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Init Database",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch New Product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch New Product": {
+      "main": [
+        [
+          {
+            "node": "New Product Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Product Entry": {
+      "main": [
+        [
+          {
+            "node": "Product Duplication Protection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Voucher Entry": {
+      "main": [
+        [
+          {
+            "node": "Voucher Duplication Protection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Telegram1": {
+      "main": [
+        [
+          {
+            "node": "Set Coupon as Posted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Product Message Format": {
+      "main": [
+        [
+          {
+            "node": "Product Alert to Telegram",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Product X Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Voucher Message Format": {
+      "main": [
+        [
+          {
+            "node": "Post to Telegram1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Voucher to X",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Product Alert to Telegram": {
+      "main": [
+        [
+          {
+            "node": "Set Product as Posted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Product Duplication Protection": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get Product Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Voucher Duplication Protection": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get Rule Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Init Database": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateId": "5893"
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "89e42408-d833-4708-93cf-67c2d49e0787",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-08-24T15:22:46.629Z",
+      "createdAt": "2026-08-24T15:22:46.629Z",
+      "role": "workflow:owner",
+      "workflowId": "6Ej0h3tYNGGnj3Bg",
+      "projectId": "qXi1KgDY8Rs5YRaI"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
