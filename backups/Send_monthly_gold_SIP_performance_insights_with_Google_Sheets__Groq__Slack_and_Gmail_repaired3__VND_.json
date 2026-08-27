@@ -1,0 +1,2076 @@
+{
+  "updatedAt": "2026-08-25T05:41:47.569Z",
+  "createdAt": "2026-08-25T05:40:49.682Z",
+  "id": "cQ2GhrQCGu6V1AwW",
+  "name": "Send monthly gold SIP performance insights with Google Sheets, Groq, Slack and Gmail-repaired3 (VND)",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Overview\nThis workflow runs on a scheduled basis, fetches real-time gold prices, calculates portfolio performance, stores historical investment data, generates AI-driven insights, and delivers actionable reports through multiple communication channels.\n\n## How to Setup \n1. Set Google Sheet with column Date, SIP Amount, Gold Price (1 gm)\n2. Set recipient email address\n3. Create Slack channel: #gold-sip-tracker\n\n## Credentials needed:\n- Google Sheets OAuth2\n- Gmail OAuth2\n- Slack Bot Token\n- Groq API / Other LLM Token",
+        "height": 552,
+        "width": 612
+      },
+      "id": "9f28c8c9-ab99-4875-b441-bc45fecb7ce3",
+      "name": "Sticky Note 6060f0b5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1312,
+        128
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "id": "2b6f85e6-207c-4330-9c14-9c67c645f5c0",
+      "name": "Groq Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "position": [
+        1312,
+        720
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "groqApi": {
+          "id": "fQQywCl92ApMxPI1",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Data ingestion layer\n\nThis group is responsible for triggering the workflow, fetching latest gold price from api, and reading user sip data from google sheets.\n\nFlow:\n- monthly trigger starts execution\n- http request fetches real-time gold price (inr/xau)\n- google sheets node loads historical sip transactions\n- error branch handles api failure and sends slack alert",
+        "height": 848,
+        "width": 560,
+        "color": 7
+      },
+      "id": "186e19a7-ab1c-4f74-af47-5b2cbd45b641",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -496,
+        128
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## SIP Calculation & Decision engine\n\nThis group calculates the complete gold sip portfolio and determines action based on performance.\n\nLogic:\n- calculate grams acquired for each transaction using historical gold price\n- aggregate total investment and total gold held\n- compute current portfolio value using latest gold price\n- calculate pnl (amount + percentage)\n- derive average buy price\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nDecision rules:\n- pnl <= -10% → loss alert (accumulation opportunity)\n- pnl >= 25% → profit booking suggestion\n- otherwise → neutral monthly update\n",
+        "height": 848,
+        "width": 512,
+        "color": 7
+      },
+      "id": "a9df7fe3-f8a7-499a-8ecf-8f4ab8b4aa36",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        128,
+        128
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## AI insights & Notification layer\n\nThis group enhances portfolio data with ai-generated insights and delivers final report to users.\n- AI agent analyzes portfolio and generates actionable insights\n- combine ai insights with portfolio metrics\n- send formatted notification via slack (and email if enabled)\n\nFeatures:\n- natural language investment advice\n- decision-based messaging (loss / profit / neutral)\n- automated monthly reporting\n",
+        "height": 848,
+        "width": 848,
+        "color": 7
+      },
+      "id": "cb209863-487d-4cfb-8d71-2466ee7368d7",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1216,
+        128
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Decision Routing Layer\n\nRoutes decision output (loss / profit / neutral) into specific branches and prepares structured input for the ai agent.\n\ngoal: ensure clean, scenario-ready data for accurate ai insights.",
+        "height": 848,
+        "width": 464,
+        "color": 7
+      },
+      "id": "ff261fd3-6a7a-4826-b015-7212073aba44",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        128
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "676eb601-966f-4c66-9257-3939bac605b6",
+      "name": "Monthly SIP Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        -640,
+        704
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "url": "https://api.metalpriceapi.com/v1/latest",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "api_key",
+              "value": "0dadd78e789f713a5dc89f3828f4e907"
+            },
+            {
+              "name": "base",
+              "value": "VND"
+            },
+            {
+              "name": "currencies",
+              "value": "XAU,INR,EUR,USD"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3bbf4c7b-c828-4c91-ab4d-d754ac8ca497",
+      "name": "Fetch Gold Price",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -432,
+        704
+      ],
+      "retryOnFail": true,
+      "typeVersion": 4.3,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1yMSnQwYfb-8BKv_-mCC1rgdqvyfpDwTrWWB49EXECpI",
+          "mode": "list",
+          "cachedResultName": "Read Investment History",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yMSnQwYfb-8BKv_-mCC1rgdqvyfpDwTrWWB49EXECpI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 717028692,
+          "mode": "list",
+          "cachedResultName": "Invest1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yMSnQwYfb-8BKv_-mCC1rgdqvyfpDwTrWWB49EXECpI/edit#gid=717028692"
+        },
+        "options": {}
+      },
+      "id": "b1ceea40-3087-49e2-8b40-538de10dcdbc",
+      "name": "Read Investment History",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        -144,
+        608
+      ],
+      "executeOnce": true,
+      "typeVersion": 4.7,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0tKf9Jmz42JPy4lj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BKUJY4H6D",
+          "mode": "list",
+          "cachedResultName": "longphu1-tpp"
+        },
+        "text": "=*SIP Automation Error* - Failed to fetch gold price on {{ $now.toFormat(\"dd MMM yyyy\") }}. Manual intervention required.",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "id": "f13c07e4-7cfb-4821-a8fd-950a523e5aeb",
+      "name": "Alert Gold Fetch Error",
+      "type": "n8n-nodes-base.slack",
+      "position": [
+        -160,
+        800
+      ],
+      "webhookId": "a460cf1d-6769-4cb0-9185-110312581d2e",
+      "typeVersion": 2.4,
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "r40WPELWZQWO5Riw",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Lấy dữ liệu từ các node trước\nconst fetchGold = $('Fetch Gold Price').first().json;\nconst sheetInput = $('Read Investment History').first().json;\n\nconst rawRates = fetchGold.rates || {};\n\n// Giá vàng hiện tại (VND/ounce)\nconst goldPriceVND = rawRates.VNDXAU || rawRates.VND || 120000000;\n\n// 2. Tính Tỷ giá USD/VND động từ API\nlet exchangeRateUSD = 25400; // Fallback an toàn\n\nif (rawRates.USDVND && rawRates.USDVND > 0) {\n  exchangeRateUSD = rawRates.USDVND;\n} else if (rawRates.VNDUSD && rawRates.VNDUSD > 0) {\n  // Nếu API trả về VNDUSD (ví dụ 0.00003937), đảo ngược lại thành USD/VND (1 / 0.00003937 ≈ 25400)\n  exchangeRateUSD = rawRates.VNDUSD < 1 ? 1 / rawRates.VNDUSD : rawRates.VNDUSD;\n} else if (rawRates.USD && rawRates.USD > 0) {\n  // Nếu base currency là VND, rates.USD chính là tỷ giá VND -> USD\n  exchangeRateUSD = rawRates.USD < 1 ? 1 / rawRates.USD : rawRates.USD;\n}\n\n// các tham số đầu vào từ Google Sheets\nconst totalInvested = parseFloat(sheetInput.totalInvested || 0);\nconst avgBuyPriceVND = parseFloat(sheetInput.avgBuyPriceVND || 0);\nconst investmentCycle = parseFloat(sheetInput['Investment cycle'] || sheetInput.investmentCycle || 1);\n\n// 3. Tính toán các chỉ số theo VND & Khối lượng\nconst sipAmountVND = investmentCycle > 0 ? totalInvested / investmentCycle : 0;\nconst totalOunces = avgBuyPriceVND > 0 ? totalInvested / avgBuyPriceVND : 0;\nconst totalGrams = totalOunces * 31.1035;\nconst currentPricePerGram = goldPriceVND / 31.1035;\nconst currentValue = totalOunces * goldPriceVND;\nconst pnlAmount = currentValue - totalInvested;\nconst pnlPercent = totalInvested > 0 ? (pnlAmount / totalInvested) * 100 : 0;\n\n// 4. Quy đổi sang USD (chia cho tỷ giá USD/VND thực tế)\nconst goldPriceUSD = goldPriceVND / exchangeRateUSD;\nconst avgBuyPriceUSD = avgBuyPriceVND / exchangeRateUSD;\nconst sipAmountUSD = sipAmountVND / exchangeRateUSD;\nconst totalInvestedUSD = totalInvested / exchangeRateUSD;\nconst currentValueUSD = currentValue / exchangeRateUSD;\nconst pnlAmountUSD = pnlAmount / exchangeRateUSD;\nconst currentPriceUSDPerGram = currentPricePerGram / exchangeRateUSD;\n\n// 5. Trả về kết quả\nreturn [{\n  json: {\n    // Đơn vị VND & Khối lượng\n    totalInvested: parseFloat(totalInvested.toFixed(2)),\n    sipAmountVND: parseFloat(sipAmountVND.toFixed(2)),\n    goldPriceVND: parseFloat(goldPriceVND.toFixed(2)),\n    avgBuyPriceVND: parseFloat(avgBuyPriceVND.toFixed(2)),\n    totalOunces: parseFloat(totalOunces.toFixed(4)),\n    totalGrams: parseFloat(totalGrams.toFixed(4)),\n    currentPricePerGram: parseFloat(currentPricePerGram.toFixed(2)),\n    currentValue: parseFloat(currentValue.toFixed(2)),\n    pnlAmount: parseFloat(pnlAmount.toFixed(2)),\n    pnlPercent: parseFloat(pnlPercent.toFixed(2)),\n\n    // Đơn vị USD\n    exchangeRateUSD: parseFloat(exchangeRateUSD.toFixed(2)),\n    goldPriceUSD: parseFloat(goldPriceUSD.toFixed(2)),\n    avgBuyPriceUSD: parseFloat(avgBuyPriceUSD.toFixed(2)),\n    sipAmountUSD: parseFloat(sipAmountUSD.toFixed(2)),\n    totalInvestedUSD: parseFloat(totalInvestedUSD.toFixed(2)),\n    currentValueUSD: parseFloat(currentValueUSD.toFixed(2)),\n    pnlAmountUSD: parseFloat(pnlAmountUSD.toFixed(2)),\n    currentPriceUSDPerGram: parseFloat(currentPriceUSDPerGram.toFixed(2))\n  }\n}];"
+      },
+      "id": "e94e45ac-a53c-469b-a659-3584c4341a26",
+      "name": "SIP Calculations",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        96,
+        608
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "loss-check",
+                    "operator": {
+                      "type": "number",
+                      "operation": "lte"
+                    },
+                    "leftValue": "={{ $json.pnlPercent }}",
+                    "rightValue": -10
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Loss Alert"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "profit-check",
+                    "operator": {
+                      "type": "number",
+                      "operation": "gte"
+                    },
+                    "leftValue": "={{ $json.pnlPercent }}",
+                    "rightValue": 25
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Profit Booking"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "neutral-check",
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    },
+                    "leftValue": "={{ $json.pnlPercent }}",
+                    "rightValue": -10
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Neutral Update"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8e0ba4fc-28a2-4f2f-bfc7-d484c1a3e8fb",
+      "name": "Decision Engine",
+      "type": "n8n-nodes-base.switch",
+      "position": [
+        400,
+        592
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "alertType",
+              "type": "string",
+              "value": "LOSS_ALERT"
+            },
+            {
+              "id": "3",
+              "name": "alertTitle",
+              "type": "string",
+              "value": "GOLD SIP — LOSS ALERT (>10%)"
+            },
+            {
+              "id": "4",
+              "name": "decisionMessage",
+              "type": "string",
+              "value": "=Portfolio is down:{{ $json.pnlPercent }}%. Consider increasing SIP to lower average cost, or review strategy."
+            },
+            {
+              "id": "5",
+              "name": "pnlPercent",
+              "type": "number",
+              "value": "={{ $json.pnlPercent }}"
+            },
+            {
+              "id": "6",
+              "name": "pnlAmount",
+              "type": "number",
+              "value": "={{ $json.pnlAmount }}"
+            },
+            {
+              "id": "7",
+              "name": "currentValue",
+              "type": "number",
+              "value": "={{ $json.currentValue }}"
+            },
+            {
+              "id": "8",
+              "name": "totalInvested",
+              "type": "number",
+              "value": "={{ $json.totalInvested }}"
+            },
+            {
+              "id": "9",
+              "name": "goldPriceVND",
+              "type": "number",
+              "value": "={{ $json.goldPriceVND }}"
+            },
+            {
+              "id": "10",
+              "name": "monthYear",
+              "type": "string",
+              "value": "={{ $('Read Investment History').item.json.monthYear }}"
+            },
+            {
+              "id": "11",
+              "name": "sipAmountVND",
+              "type": "number",
+              "value": "={{ $json.sipAmountVND }}"
+            },
+            {
+              "id": "12",
+              "name": "avgBuyPriceVND",
+              "type": "number",
+              "value": "={{ $json.avgBuyPriceVND }}"
+            },
+            {
+              "id": "13",
+              "name": "totalGrams",
+              "type": "number",
+              "value": "={{ $json.totalGrams }}"
+            },
+            {
+              "id": "8a1a5230-265d-46d0-a0e5-df569014736a",
+              "name": "alertEmoji",
+              "value": "=📉",
+              "type": "string"
+            },
+            {
+              "id": "dad2cedb-9b80-4225-82a7-1c064f99242a",
+              "name": "monthYear",
+              "value": "={{ $('Read Investment History').item.json.monthYear }}",
+              "type": "string"
+            },
+            {
+              "id": "5cc5f6bc-32cc-4051-b4a4-3d293bc3ad4c",
+              "name": "sipAmountVND",
+              "value": "={{ $('SIP Calculations').item.json.sipAmountVND }}",
+              "type": "string"
+            },
+            {
+              "id": "bf4253f8-65b6-4228-9d00-b43cfcf8d956",
+              "name": "sipAmountUSD",
+              "value": "={{ $('SIP Calculations').item.json.sipAmountUSD }}",
+              "type": "string"
+            },
+            {
+              "id": "8537ea23-755a-42ae-bed8-7cd97e8c1b71",
+              "name": "pnlAmountUSD",
+              "value": "={{ $('SIP Calculations').item.json.pnlAmountUSD }}",
+              "type": "string"
+            },
+            {
+              "id": "6751e80e-cfd0-4148-979a-f0a25452a041",
+              "name": "totalInvestedUSD",
+              "value": "={{ $('SIP Calculations').item.json.totalInvestedUSD }}",
+              "type": "number"
+            },
+            {
+              "id": "91bc7962-ff98-429d-8137-1a3cf53e35d4",
+              "name": "goldPriceUSD",
+              "value": "={{ $('SIP Calculations').item.json.goldPriceUSD }}",
+              "type": "number"
+            },
+            {
+              "id": "3fc3effb-1a82-465f-906f-056f696c8bce",
+              "name": "currentValueUSD",
+              "value": "={{ $('SIP Calculations').item.json.currentValueUSD }}",
+              "type": "number"
+            },
+            {
+              "id": "1e562029-740b-432c-8fef-180372ac8521",
+              "name": "currentPriceUSDPerGram",
+              "value": "={{ $('SIP Calculations').item.json.currentPriceUSDPerGram }}",
+              "type": "number"
+            },
+            {
+              "id": "01628fd6-b45d-40bf-9ab8-bcc216d76ffb",
+              "name": "avgBuyPriceUSD",
+              "value": "={{ $('SIP Calculations').item.json.avgBuyPriceUSD }}",
+              "type": "number"
+            },
+            {
+              "id": "aa8c1993-7a6d-4350-82db-b46452d8cb8e",
+              "name": "currentPricePerGram",
+              "value": "={{ $('SIP Calculations').item.json.currentPricePerGram }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7436086e-2a03-4b8a-8d90-977447de7438",
+      "name": "Prepare Loss Alert",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        720,
+        432
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "alertType",
+              "type": "string",
+              "value": "PROFIT_BOOKING"
+            },
+            {
+              "id": "3",
+              "name": "alertTitle",
+              "type": "string",
+              "value": "GOLD SIP — PROFIT BOOKING SUGGESTION (>25%)"
+            },
+            {
+              "id": "4",
+              "name": "decisionMessage",
+              "type": "string",
+              "value": "=Excellent! Portfolio is up\n:{{ $json.pnlPercent }}%. Consider booking 25-30% of profits and reinvesting at lower levels."
+            },
+            {
+              "id": "5",
+              "name": "pnlPercent",
+              "type": "number",
+              "value": "={{ $json.pnlPercent }}"
+            },
+            {
+              "id": "6",
+              "name": "pnlAmount",
+              "type": "number",
+              "value": "={{ $json.pnlAmount }}"
+            },
+            {
+              "id": "7",
+              "name": "currentValue",
+              "type": "number",
+              "value": "={{ $json.currentValue }}"
+            },
+            {
+              "id": "8",
+              "name": "totalInvested",
+              "type": "number",
+              "value": "={{ $json.totalInvested }}"
+            },
+            {
+              "id": "9",
+              "name": "goldPriceVND",
+              "type": "number",
+              "value": "={{ $json.goldPriceVND }}"
+            },
+            {
+              "id": "12",
+              "name": "avgBuyPriceVND",
+              "type": "number",
+              "value": "={{ $json.avgBuyPriceVND }}"
+            },
+            {
+              "id": "13",
+              "name": "totalGrams",
+              "type": "number",
+              "value": "={{ $json.totalGrams }}"
+            },
+            {
+              "id": "87c19b13-9033-4400-8e67-3168724fd6d1",
+              "name": "alertEmoji",
+              "value": "=📈",
+              "type": "string"
+            },
+            {
+              "id": "2b127d40-641e-47d3-a53a-ede9818ebd73",
+              "name": "monthYear",
+              "value": "={{ $('Read Investment History').item.json.monthYear }}",
+              "type": "string"
+            },
+            {
+              "id": "e45826b1-534e-4e88-a298-6a32b4800f12",
+              "name": "sipAmountVND",
+              "value": "={{ $('SIP Calculations').item.json.sipAmountVND }}",
+              "type": "string"
+            },
+            {
+              "id": "46e7d03c-1c88-4511-a6b7-438fb8f24982",
+              "name": "sipAmountUSD",
+              "value": "={{ $('SIP Calculations').item.json.sipAmountUSD }}",
+              "type": "string"
+            },
+            {
+              "id": "191e729f-bb0e-4c8d-b5dc-b9fcea7b8bfd",
+              "name": "pnlAmountUSD",
+              "value": "={{ $('SIP Calculations').item.json.pnlAmountUSD }}",
+              "type": "string"
+            },
+            {
+              "id": "efa64901-a26e-474c-8f69-cb5eb4fb4d5b",
+              "name": "TotalInvestedUSD",
+              "value": "={{ $('SIP Calculations').item.json.totalInvestedUSD }}",
+              "type": "number"
+            },
+            {
+              "id": "f50edf63-75db-49cd-b70b-1706ecedcf07",
+              "name": "goldPriceUSD",
+              "value": "={{ $('SIP Calculations').item.json.goldPriceUSD }}",
+              "type": "number"
+            },
+            {
+              "id": "2380ab3f-e40f-41b6-af1c-89d5b17fc428",
+              "name": "currentValueUSD",
+              "value": "={{ $('SIP Calculations').item.json.currentValueUSD }}",
+              "type": "number"
+            },
+            {
+              "id": "96b3f47f-2a0f-4e07-8a65-9b9a980130fd",
+              "name": "currentPriceUSDPerGram",
+              "value": "={{ $('SIP Calculations').item.json.currentPriceUSDPerGram }}",
+              "type": "number"
+            },
+            {
+              "id": "b35a6f90-bced-43aa-b812-5d5ed03c8e50",
+              "name": "avgBuyPriceUSD",
+              "value": "={{ $('SIP Calculations').item.json.avgBuyPriceUSD }}",
+              "type": "number"
+            },
+            {
+              "id": "52c7aff0-a4f3-4f29-8255-3f152c7f5aea",
+              "name": "currentPricePerGram",
+              "value": "={{ $('SIP Calculations').item.json.currentPricePerGram }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c01310b4-d743-469c-a588-c3161be1fa47",
+      "name": "Prepare Profit Booking",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        720,
+        720
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "alertType",
+              "type": "string",
+              "value": "MONTHLY_UPDATE"
+            },
+            {
+              "id": "3",
+              "name": "alertTitle",
+              "type": "string",
+              "value": "GOLD SIP — Monthly Portfolio Update"
+            },
+            {
+              "id": "4",
+              "name": "decisionMessage",
+              "type": "string",
+              "value": "=Portfolio is tracking at:{{ $json.pnlPercent }}%. Continue your SIP schedule consistently."
+            },
+            {
+              "id": "5",
+              "name": "pnlPercent",
+              "type": "number",
+              "value": "={{ $json.pnlPercent }}"
+            },
+            {
+              "id": "6",
+              "name": "pnlAmount",
+              "type": "number",
+              "value": "={{ $json.pnlAmount }}"
+            },
+            {
+              "id": "7",
+              "name": "currentValue",
+              "type": "number",
+              "value": "={{ $json.currentValue }}"
+            },
+            {
+              "id": "8",
+              "name": "totalInvested",
+              "type": "number",
+              "value": "={{ $json.totalInvested }}"
+            },
+            {
+              "id": "9",
+              "name": "goldPriceVND",
+              "type": "number",
+              "value": "={{ $json.goldPriceVND }}"
+            },
+            {
+              "id": "12",
+              "name": "avgBuyPriceVND",
+              "type": "number",
+              "value": "={{ $json.avgBuyPriceVND }}"
+            },
+            {
+              "id": "13",
+              "name": "totalGrams",
+              "type": "number",
+              "value": "={{ $json.totalGrams }}"
+            },
+            {
+              "id": "dbec79dc-748e-4014-93ca-cfbcaac3b8f5",
+              "name": "alertEmoji",
+              "value": "=📊",
+              "type": "string"
+            },
+            {
+              "id": "9b468354-123b-45a3-b775-14e1680884f8",
+              "name": "monthYear",
+              "value": "={{ $('Read Investment History').item.json.monthYear }}",
+              "type": "string"
+            },
+            {
+              "id": "b25fe686-426c-4462-9192-7f46eaedc91a",
+              "name": "sipAmountVND",
+              "value": "={{ $('SIP Calculations').item.json.sipAmountVND }}",
+              "type": "string"
+            },
+            {
+              "id": "989e3561-877a-4541-aa9b-eb62b4d3a41d",
+              "name": "sipAmountUSD",
+              "value": "={{ $('SIP Calculations').item.json.sipAmountUSD }}",
+              "type": "string"
+            },
+            {
+              "id": "2a1e45c6-a6ff-46eb-b8bd-800dd44f344b",
+              "name": "pnlAmountUSD",
+              "value": "={{ $('SIP Calculations').item.json.pnlAmountUSD }}",
+              "type": "string"
+            },
+            {
+              "id": "e0af0f55-d66f-4afc-8024-3bc7560d792d",
+              "name": "goldPriceUSD",
+              "value": "={{ $json.goldPriceUSD }}",
+              "type": "number"
+            },
+            {
+              "id": "b942633a-2928-4cde-b79a-893f70382752",
+              "name": "totalInvestedUSD",
+              "value": "={{ $json.totalInvestedUSD }}",
+              "type": "number"
+            },
+            {
+              "id": "35815316-aa9d-45cb-9da4-b4413fbd0dba",
+              "name": "currentValueUSD",
+              "value": "={{ $('SIP Calculations').item.json.currentValueUSD }}",
+              "type": "number"
+            },
+            {
+              "id": "ae2654ad-10be-4aa6-b2b7-b2b4c042e0dc",
+              "name": "currentPriceUSDPerGram",
+              "value": "={{ $('SIP Calculations').item.json.currentPriceUSDPerGram }}",
+              "type": "number"
+            },
+            {
+              "id": "ee33c0b9-cd24-48a5-996d-616589efbce0",
+              "name": "avgBuyPriceUSD",
+              "value": "={{ $('SIP Calculations').item.json.avgBuyPriceUSD }}",
+              "type": "number"
+            },
+            {
+              "id": "a4db32ae-b0d5-4a53-a646-0681906e7c91",
+              "name": "currentPricePerGram",
+              "value": "={{ $('SIP Calculations').item.json.currentPricePerGram }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f6ff7731-5385-4a01-be5d-fe34177e0350",
+      "name": "Prepare Neutral Status",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        704,
+        928
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a gold investment advisor. Analyze this monthly SIP data and provide 3-4 concise actionable insights in plain text (no markdown, no bullet symbols).\n\nPortfolio Summary:\n- Month: {{ $json.monthYear }}\n- Gold Price VND (per troy oz): {{ $json.goldPriceVND }}/USD:{{ $json.goldPriceUSD }}\n- Monthly SIP: Rs {{ $json.sipAmountVND }}/USD:{{ $json.sipAmountUSD }}\n- Total Invested: Rs {{ $json.totalInvested }}/USD:{{ $json.totalInvestedUSD }}\n- Current Value: Rs {{ $json.currentValue }}/USD:{{ $json.currentValueUSD }}\n- P&L: Rs {{ $json.pnlAmount }}/USD:{{ $json.pnlAmountUSD }}({{ $json.pnlPercent }}%)\n- Avg Buy Price per gram: Rs {{ $json.avgBuyPriceVND }}/USD:{{ $json.avgBuyPriceUSD }}\n- Current Buy Price per gram: Rs {{ $json.currentPricePerGram }}/USD:{{ $json.currentPriceUSDPerGram }}\n- Total Grams Held: {{ $json.totalGrams }}\n- Alert Status: {{ $json.alertType }}\n- Decision: {{ $json.decisionMessage }}\n\nProvide insights on: market trend, cost averaging effectiveness, risk assessment, and a 3-month outlook. Max 180 words.\n",
+        "options": {}
+      },
+      "id": "5115ccb7-634b-4fd8-ae1a-260dca7fd2e1",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1264,
+        512
+      ],
+      "typeVersion": 3.1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "aiInsights",
+              "type": "string",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "id": "2",
+              "name": "alertType",
+              "type": "string",
+              "value": "={{ $('Merge Decision Branches').item.json.alertType }}"
+            },
+            {
+              "id": "4",
+              "name": "alertTitle",
+              "type": "string",
+              "value": "={{ $('Merge Decision Branches').item.json.alertTitle }}"
+            },
+            {
+              "id": "5",
+              "name": "decisionMessage",
+              "type": "string",
+              "value": "={{ $('Merge Decision Branches').item.json.decisionMessage }}"
+            },
+            {
+              "id": "6",
+              "name": "pnlPercent",
+              "type": "number",
+              "value": "={{ $('Merge Decision Branches').item.json.pnlPercent }}"
+            },
+            {
+              "id": "7",
+              "name": "pnlAmount",
+              "type": "number",
+              "value": "={{ $('Merge Decision Branches').item.json.pnlAmount }}"
+            },
+            {
+              "id": "8",
+              "name": "currentValue",
+              "type": "number",
+              "value": "={{ $('Merge Decision Branches').item.json.currentValue }}"
+            },
+            {
+              "id": "9",
+              "name": "totalInvested",
+              "type": "number",
+              "value": "={{ $('Merge Decision Branches').item.json.totalInvested }}"
+            },
+            {
+              "id": "10",
+              "name": "goldPriceVND",
+              "type": "number",
+              "value": "={{ $('Merge Decision Branches').item.json.goldPriceVND }}"
+            },
+            {
+              "id": "11",
+              "name": "monthYear",
+              "type": "string",
+              "value": "={{ $('Merge Decision Branches').item.json.monthYear }}"
+            },
+            {
+              "id": "12",
+              "name": "sipAmountVND",
+              "type": "number",
+              "value": "={{ $('Merge Decision Branches').item.json.sipAmountVND }}"
+            },
+            {
+              "id": "13",
+              "name": "avgBuyPriceVND",
+              "type": "number",
+              "value": "={{ $('Merge Decision Branches').item.json.avgBuyPriceVND }}"
+            },
+            {
+              "id": "14",
+              "name": "totalGrams",
+              "type": "number",
+              "value": "={{ $('Merge Decision Branches').item.json.totalGrams }}"
+            },
+            {
+              "id": "2b94c745-364b-4902-84ae-5b421a9d9f8d",
+              "name": "sipAmountUSD",
+              "value": "={{ $('Merge Decision Branches').item.json.sipAmountUSD }}",
+              "type": "string"
+            },
+            {
+              "id": "0adef381-39a1-43d9-aa94-6c427a43e548",
+              "name": "pnlAmountUSD",
+              "value": "={{ $('Merge Decision Branches').item.json.pnlAmountUSD }}",
+              "type": "string"
+            },
+            {
+              "id": "a135bbfb-f046-4456-b7ab-491bc68e02a4",
+              "name": "goldPriceUSD",
+              "value": "={{ $('Merge Decision Branches').item.json.goldPriceUSD }}",
+              "type": "number"
+            },
+            {
+              "id": "0aeb681d-7408-4458-b301-c45422e35856",
+              "name": "totalInvestedUSD",
+              "value": "={{ $('Merge Decision Branches').item.json.totalInvestedUSD }}",
+              "type": "number"
+            },
+            {
+              "id": "7dc3e021-66af-4f72-b566-77a65039baaf",
+              "name": "currentValueUSD",
+              "value": "={{ $('Merge Decision Branches').item.json.currentValueUSD }}",
+              "type": "number"
+            },
+            {
+              "id": "f137b2f6-faf1-4822-9599-ef91bae6f59a",
+              "name": "avgBuyPriceUSD",
+              "value": "={{ $('Merge Decision Branches').item.json.avgBuyPriceUSD }}",
+              "type": "number"
+            },
+            {
+              "id": "3bcd0507-e87e-4612-ae12-ce854ed79d25",
+              "name": "currentPriceUSDPerGram",
+              "value": "={{ $('Merge Decision Branches').item.json.currentPriceUSDPerGram }}",
+              "type": "number"
+            },
+            {
+              "id": "a3fe86cc-fc09-4b61-adb6-204b8b3a6a71",
+              "name": "currentPricePerGram",
+              "value": "={{ $('Merge Decision Branches').item.json.currentPricePerGram }}",
+              "type": "number"
+            },
+            {
+              "id": "0fb083eb-5d2f-4fa3-9673-718c80dfc750",
+              "name": "alertEmoji",
+              "value": "={{ $('Merge Decision Branches').item.json.alertEmoji }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c8e288cc-9cbd-45bd-971f-23e4106ccae1",
+      "name": "Prepare Final Notification",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1616,
+        576
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BKUJY4H6D",
+          "mode": "list",
+          "cachedResultName": "longphu1-tpp"
+        },
+        "text": "={{ $json.alertEmoji }}:{{ $json.alertTitle }}* | {{ $json.monthYear }}\n\n*Portfolio Snapshot:*\nMonthly SIP: Rs VND:{{ $json.sipAmountVND }} (USD: ${{ $json.sipAmountUSD }})\nGold Price: Rs VND:{{ $json.goldPriceVND }} (USD: {{ $json.goldPriceUSD }})\nTotal Invested: Rs VND:{{ $json.totalInvested }} (USD: {{ $json.totalInvestedUSD }})\nCurrent Value: Rs VND:{{ $json.currentValue }} (USD: {{ $json.currentValueUSD }})\nP&L: Rs VND:{{ $json.pnlAmount }} (USD: {{$json.pnlAmountUSD}}): {{$json.pnlPercent }}%\nAvg Buy Price/gram: Rs VND:{{ $json.avgBuyPriceVND }} (USD: {{ $json.avgBuyPriceUSD }})\nCurrent Buy Price/gram: Rs VND:{{ $json.currentPricePerGram }} (USD: {{ $json.currentPriceUSDPerGram }})\nTotal Gold Held: {{ $json.totalGrams }} grams\n*Decision:* {{ $json.decisionMessage }}\n\n*AI Insights:*\n{{ $json.aiInsights }}\n",
+        "otherOptions": {
+          "includeLinkToWorkflow": false,
+          "mrkdwn": true
+        }
+      },
+      "id": "6176448d-9115-47e7-8643-2b52bf5fc7ae",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "position": [
+        1856,
+        512
+      ],
+      "webhookId": "de9967ac-b9e9-4da6-9e89-1469b407a6d0",
+      "typeVersion": 2.4,
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "r40WPELWZQWO5Riw",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "vinhandvinh@gmail.com",
+        "subject": "=Gold SIP Report {{ $json.monthYear }} | P&L: {{ $json.pnlPercent }}%",
+        "message": "=<html><body style=\"font-family:Arial,sans-serif;max-width:620px;margin:auto;padding:24px;color:#333\">\n<h2 style=\"color:#B8860B;border-bottom:2px solid #B8860B;padding-bottom:8px\">{{ $json.alertEmoji }} {{ $json.alertTitle }}</h2>\n<p style=\"color:#666\">Period: <strong>{{ $json.monthYear }}</strong></p>\n<table style=\"width:100%;border-collapse:collapse;margin:16px 0;font-size:14px\">\n<tr style=\"background:#fdf8ec\"><td style=\"padding:10px;border:1px solid #e0d5b0\"><strong>Gold Price (per troy oz)</strong></td><td style=\"padding:10px;border:1px solid #e0d5b0\">Rs VND:{{ $json.goldPriceVND }} USD:{{ $json.goldPriceUSD }}</td></tr>\n<tr><td style=\"padding:10px;border:1px solid #e0d5b0\"><strong>Monthly SIP</strong><tr><td style=\"padding:10px;border:1px solid #e0d5b0\"><strong>Monthly SIP</strong></td><td style=\"padding:10px;border:1px solid #e0d5b0\">Rs VND:{{ $json.sipAmountVND }} (USD:${{ $json.sipAmountUSD }})</td></tr>\n<tr style=\"background:#fdf8ec\"><td style=\"padding:10px;border:1px solid #e0d5b0\"><strong>Total Invested</strong></td><td style=\"padding:10px;border:1px solid #e0d5b0\">Rs VND:{{ $json.totalInvested }} USD:{{ $json.totalInvestedUSD }}</td></tr>\n<tr><td style=\"padding:10px;border:1px solid #e0d5b0\"><strong>Current Value</strong></td><td style=\"padding:10px;border:1px solid #e0d5b0\">Rs VND:{{ $json.currentValue }} USD:{{ $json.currentValueUSD }}</td></tr>\n<tr style=\"background:#fdf8ec\"><td style=\"padding:10px;border:1px solid #e0d5b0\"><strong>P&amp;L Amount</strong></td><td style=\"padding:10px;border:1px solid #e0d5b0\"><strong>Rs VND:{{ $json.pnlAmount }} USD:{{ $json.pnlAmountUSD }}({{ $json.pnlPercent }}%)</strong></td></tr>\n<tr><td style=\"padding:10px;border:1px solid #e0d5b0\"><strong>Avg Buy Price per gram</strong></td><td style=\"padding:10px;border:1px solid #e0d5b0\">Rs VND:{{ $json.avgBuyPriceVND }} USD:{{ $json.avgBuyPriceUSD }}</td></tr>\n<tr style=\"background:#fdf8ec\"><td style=\"padding:10px;border:1px solid #e0d5b0\"><strong>Total Gold Held</strong></td><td style=\"padding:10px;border:1px solid #e0d5b0\">{{ $json.totalGrams }} grams</td></tr>\n</table>\n<div style=\"background:#fff8e1;border-left:4px solid #B8860B;padding:12px;margin:16px 0\">\n<strong>Decision:</strong> {{ $json.decisionMessage }}\n</div>\n<h3 style=\"color:#B8860B\">AI Insights</h3>\n<div style=\"background:#f5f5f5;padding:14px;border-radius:6px;font-size:13px;line-height:1.6\">{{ $json.aiInsights }}</div>\n<p style=\"color:#aaa;font-size:11px;margin-top:20px;border-top:1px solid #eee;padding-top:12px\">Automated by n8n Gold SIP Tracker. This is not financial advice.</p>\n</body></html>\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "dd62b1db-1da3-48c4-90ad-d54ecb88f267",
+      "name": "Send Email Report",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        1856,
+        704
+      ],
+      "webhookId": "0ad91467-fe63-4bbf-92f7-059bd7d1910a",
+      "typeVersion": 2.2,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "TIr88HbtOem3QaH9",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "id": "9aeb71fb-56d9-4e10-93e3-b7697e2688ad",
+      "name": "Merge Decision Branches",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        960,
+        496
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1yMSnQwYfb-8BKv_-mCC1rgdqvyfpDwTrWWB49EXECpI",
+          "mode": "list",
+          "cachedResultName": "Read Investment History",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yMSnQwYfb-8BKv_-mCC1rgdqvyfpDwTrWWB49EXECpI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 112640318,
+          "mode": "list",
+          "cachedResultName": "update3",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yMSnQwYfb-8BKv_-mCC1rgdqvyfpDwTrWWB49EXECpI/edit#gid=112640318"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "aiInsights"
+          ],
+          "schema": [
+            {
+              "id": "aiInsights",
+              "displayName": "aiInsights",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "alertType",
+              "displayName": "alertType",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "alertTitle",
+              "displayName": "alertTitle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "alertEmoji",
+              "displayName": "alertEmoji",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "decisionMessage",
+              "displayName": "decisionMessage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "pnlPercent",
+              "displayName": "pnlPercent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "pnlAmount",
+              "displayName": "pnlAmount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "currentValue",
+              "displayName": "currentValue",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "currentPricePerGram",
+              "displayName": "currentPricePerGram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "totalInvested",
+              "displayName": "totalInvested",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "goldPriceVND",
+              "displayName": "goldPriceVND",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "monthYear",
+              "displayName": "monthYear",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Investment cycle",
+              "displayName": "Investment cycle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sipAmountVND",
+              "displayName": "sipAmountVND",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "avgBuyPriceVND",
+              "displayName": "avgBuyPriceVND",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sipAmountUSD",
+              "displayName": "sipAmountUSD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "avgBuyPriceUSD",
+              "displayName": "avgBuyPriceUSD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "pnlAmountUSD",
+              "displayName": "pnlAmountUSD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "currentValueUSD",
+              "displayName": "currentValueUSD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "currentPriceUSDPerGram",
+              "displayName": "currentPriceUSDPerGram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "totalGrams",
+              "displayName": "totalGrams",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "goldPriceUSD",
+              "displayName": "goldPriceUSD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "totalInvestedUSD",
+              "displayName": "totalInvestedUSD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1360,
+        912
+      ],
+      "id": "4553d3c9-2779-4916-8ecb-0a6b4b8f0af2",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0tKf9Jmz42JPy4lj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1yMSnQwYfb-8BKv_-mCC1rgdqvyfpDwTrWWB49EXECpI",
+          "mode": "list",
+          "cachedResultName": "Read Investment History",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yMSnQwYfb-8BKv_-mCC1rgdqvyfpDwTrWWB49EXECpI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1156074334,
+          "mode": "list",
+          "cachedResultName": "update4",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yMSnQwYfb-8BKv_-mCC1rgdqvyfpDwTrWWB49EXECpI/edit#gid=1156074334"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "aiInsights"
+          ],
+          "schema": [
+            {
+              "id": "aiInsights",
+              "displayName": "aiInsights",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "alertType",
+              "displayName": "alertType",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "alertTitle",
+              "displayName": "alertTitle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "alertEmoji",
+              "displayName": "alertEmoji",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "decisionMessage",
+              "displayName": "decisionMessage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "pnlPercent",
+              "displayName": "pnlPercent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "pnlAmount",
+              "displayName": "pnlAmount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "currentValue",
+              "displayName": "currentValue",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "currentPricePerGram",
+              "displayName": "currentPricePerGram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "totalInvested",
+              "displayName": "totalInvested",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "goldPriceVND",
+              "displayName": "goldPriceVND",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "monthYear",
+              "displayName": "monthYear",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Investment cycle",
+              "displayName": "Investment cycle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sipAmountVND",
+              "displayName": "sipAmountVND",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "avgBuyPriceVND",
+              "displayName": "avgBuyPriceVND",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sipAmountUSD",
+              "displayName": "sipAmountUSD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "avgBuyPriceUSD",
+              "displayName": "avgBuyPriceUSD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "pnlAmountUSD",
+              "displayName": "pnlAmountUSD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "currentValueUSD",
+              "displayName": "currentValueUSD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "currentPriceUSDPerGram",
+              "displayName": "currentPriceUSDPerGram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "totalGrams",
+              "displayName": "totalGrams",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "goldPriceUSD",
+              "displayName": "goldPriceUSD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "totalInvestedUSD",
+              "displayName": "totalInvestedUSD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1760,
+        928
+      ],
+      "id": "162afdc8-5ddc-4f1a-995d-e981dbda5e66",
+      "name": "Append or update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0tKf9Jmz42JPy4lj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "(https://api.metalpriceapi.com/v1/){{ $json.monthYear }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "api_key",
+              "value": "29ce26bdb53d106c78d1dfa1aee7893a"
+            },
+            {
+              "name": "USD"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -32,
+        288
+      ],
+      "id": "f2dbd541-c3c0-4f7d-9b4f-4628c4f44f77",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Khai báo tỷ giá USD/INR và lấy các biến gốc từ Input\nconst exchangeRateUSD = 83; // Tỷ giá quy đổi USD/INR\n\nconst sipAmountINR = $input.item.json.sipAmountINR || 0;\nconst avgBuyPriceINR = $input.item.json.avgBuyPriceINR || 0;\nconst pnlAmount = $input.item.json.pnlAmount || 0;\nconst currentValue = $input.item.json.currentValue || 0;\nconst currentPricePerGram = $input.item.json.currentPricePerGram || 0;\nconst goldPriceINR = $input.item.json.goldPriceINR || 0;\nconst totalInvested = $input.item.json.totalInvested || 0;\n\n// 2. Tính toán các biến USD\nconst sipAmountUSD = sipAmountINR / exchangeRateUSD;\nconst avgBuyPriceUSD = avgBuyPriceINR / exchangeRateUSD;\nconst pnlAmountUSD = pnlAmount / exchangeRateUSD;\nconst currentValueUSD = currentValue / exchangeRateUSD;\nconst currentPriceUSDPerGram = currentPricePerGram / exchangeRateUSD;\nconst goldPriceUSD = goldPriceINR / exchangeRateUSD;\nconst totalInvestedUSD = totalInvested / exchangeRateUSD;\n\n// 3. Trả về kết quả\nreturn [{\n  json: {\n    ...$input.item.json,\n    sipAmountUSD: parseFloat(sipAmountUSD.toFixed(2)),\n    avgBuyPriceUSD: parseFloat(avgBuyPriceUSD.toFixed(2)),\n    pnlAmountUSD: parseFloat(pnlAmountUSD.toFixed(2)),\n    currentValueUSD: parseFloat(currentValueUSD.toFixed(2)),\n    currentPriceUSDPerGram: parseFloat(currentPriceUSDPerGram.toFixed(2)),\n    goldPriceUSD: parseFloat(goldPriceUSD.toFixed(2)),\n    totalInvestedUSD: parseFloat(totalInvestedUSD.toFixed(2))\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        48
+      ],
+      "id": "295a08bc-66a7-49ea-ad8e-986cf91c5421",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "url": "https://api.metalpriceapi.com/v1/latest",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "api_key",
+              "value": "29ce26bdb53d106c78d1dfa1aee7893a"
+            },
+            {
+              "name": "base",
+              "value": "INR"
+            },
+            {
+              "name": "currencies",
+              "value": "USD"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ff45976a-10c9-44cd-b430-5ae02a66d885",
+      "name": "Fetch Gold Price1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        0,
+        0
+      ],
+      "retryOnFail": false,
+      "typeVersion": 4.3,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1yMSnQwYfb-8BKv_-mCC1rgdqvyfpDwTrWWB49EXECpI",
+          "mode": "list",
+          "cachedResultName": "Read Investment History",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yMSnQwYfb-8BKv_-mCC1rgdqvyfpDwTrWWB49EXECpI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Invest",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yMSnQwYfb-8BKv_-mCC1rgdqvyfpDwTrWWB49EXECpI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {
+            "monthYear": "={{ $('Monthly SIP Trigger').item.json.timestamp }}"
+          },
+          "matchingColumns": [
+            "monthYear"
+          ],
+          "schema": [
+            {
+              "id": "aiInsights",
+              "displayName": "aiInsights",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "alertType",
+              "displayName": "alertType",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "alertTitle",
+              "displayName": "alertTitle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "alertEmoji",
+              "displayName": "alertEmoji",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "decisionMessage",
+              "displayName": "decisionMessage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "pnlPercent",
+              "displayName": "pnlPercent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "pnlAmount",
+              "displayName": "pnlAmount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "currentValue",
+              "displayName": "currentValue",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "currentPricePerGram",
+              "displayName": "currentPricePerGram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "totalInvested",
+              "displayName": "totalInvested",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "goldPriceINR",
+              "displayName": "goldPriceINR",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "monthYear",
+              "displayName": "monthYear",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sipAmountINR",
+              "displayName": "sipAmountINR",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "avgBuyPriceINR",
+              "displayName": "avgBuyPriceINR",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "sipAmountUSD",
+              "displayName": "sipAmountUSD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "avgBuyPriceUSD",
+              "displayName": "avgBuyPriceUSD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "pnlAmountUSD",
+              "displayName": "pnlAmountUSD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "currentValueUSD",
+              "displayName": "currentValueUSD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "currentPriceUSDPerGram",
+              "displayName": "currentPriceUSDPerGram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "totalGrams",
+              "displayName": "totalGrams",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "success",
+              "displayName": "success",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "base",
+              "displayName": "base",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "rates",
+              "displayName": "rates",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -304,
+        384
+      ],
+      "id": "2148ce3e-a35a-411d-9843-fbcf96266859",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0tKf9Jmz42JPy4lj",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Prepare Final Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decision Engine": {
+      "main": [
+        [
+          {
+            "node": "Prepare Loss Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Profit Booking",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Neutral Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Gold Price": {
+      "main": [
+        [
+          {
+            "node": "Read Investment History",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Alert Gold Fetch Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SIP Calculations": {
+      "main": [
+        [
+          {
+            "node": "Decision Engine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Loss Alert": {
+      "main": [
+        [
+          {
+            "node": "Merge Decision Branches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monthly SIP Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Gold Price",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Neutral Status": {
+      "main": [
+        [
+          {
+            "node": "Merge Decision Branches",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Prepare Profit Booking": {
+      "main": [
+        [
+          {
+            "node": "Merge Decision Branches",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Decision Branches": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Investment History": {
+      "main": [
+        [
+          {
+            "node": "SIP Calculations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Final Notification": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Email Report",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Append or update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "8f7a5dad-6a27-4bc3-b685-c5a561de24d3",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-08-25T05:40:49.682Z",
+      "createdAt": "2026-08-25T05:40:49.682Z",
+      "role": "workflow:owner",
+      "workflowId": "cQ2GhrQCGu6V1AwW",
+      "projectId": "qXi1KgDY8Rs5YRaI"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
