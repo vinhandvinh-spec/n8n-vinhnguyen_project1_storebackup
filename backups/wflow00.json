@@ -1,13 +1,57 @@
 {
-  "updatedAt": "2026-08-26T15:07:51.836Z",
-  "createdAt": "2026-08-26T14:19:29.974Z",
-  "id": "bpg0GPTVnkUTHkb4",
+  "updatedAt": "2026-08-27T02:42:59.008Z",
+  "createdAt": "2026-08-27T02:41:56.538Z",
+  "id": "g1tMceUrvnjWTqU7",
   "name": "wflow00",
   "description": null,
   "active": false,
   "isArchived": false,
-  "nodes": [],
-  "connections": {},
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e449c280-db86-4118-94ee-de0bf5a24ade",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        208,
+        0
+      ],
+      "id": "1996fc05-33d1-477c-887f-1e32d9ee524b",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "pQHgIuziKCbMOMzX",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
@@ -15,22 +59,21 @@
   },
   "staticData": null,
   "meta": {
-    "templateId": "4928",
     "templateCredsSetupCompleted": true
   },
   "nodeGroups": [],
   "pinData": {},
-  "versionId": "a12d1277-6b2f-4d21-af20-88e55eff82ee",
+  "versionId": "ed09f1c0-2595-470a-94c2-49c8d73ce045",
   "activeVersionId": null,
-  "versionCounter": 4,
+  "versionCounter": 3,
   "triggerCount": 0,
   "sourceWorkflowId": null,
   "shared": [
     {
-      "updatedAt": "2026-08-26T14:19:29.974Z",
-      "createdAt": "2026-08-26T14:19:29.974Z",
+      "updatedAt": "2026-08-27T02:41:56.538Z",
+      "createdAt": "2026-08-27T02:41:56.538Z",
       "role": "workflow:owner",
-      "workflowId": "bpg0GPTVnkUTHkb4",
+      "workflowId": "g1tMceUrvnjWTqU7",
       "projectId": "qXi1KgDY8Rs5YRaI",
       "project": {
         "updatedAt": "2026-08-24T01:36:18.608Z",
