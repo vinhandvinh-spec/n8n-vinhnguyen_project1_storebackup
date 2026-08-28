@@ -3,7 +3,6 @@
   "createdAt": "2026-08-28T05:20:28.169Z",
   "id": "01fvQ86kZTvJfL7j",
   "name": "wflow00",
-  "description": null,
   "active": false,
   "isArchived": false,
   "nodes": [
@@ -62,29 +61,16 @@
   "pinData": null,
   "versionId": "a7423520-8ce1-47ff-a2f2-d3f0df93f081",
   "activeVersionId": null,
-  "versionCounter": 1,
   "triggerCount": 0,
-  "sourceWorkflowId": null,
   "shared": [
     {
       "updatedAt": "2026-08-28T05:20:28.169Z",
       "createdAt": "2026-08-28T05:20:28.169Z",
       "role": "workflow:owner",
       "workflowId": "01fvQ86kZTvJfL7j",
-      "projectId": "qXi1KgDY8Rs5YRaI",
-      "project": {
-        "updatedAt": "2026-08-24T01:36:18.608Z",
-        "createdAt": "2026-08-24T01:34:26.934Z",
-        "id": "qXi1KgDY8Rs5YRaI",
-        "name": "Nguyen Vinh <vinhminh2005@gmail.com>",
-        "type": "personal",
-        "icon": null,
-        "description": null,
-        "customTelemetryTags": [],
-        "creatorId": "75384fed-9e02-4e4e-8244-2418fdadef5b"
-      }
+      "projectId": "qXi1KgDY8Rs5YRaI"
     }
   ],
-  "tags": [],
-  "activeVersion": null
+  "activeVersion": null,
+  "tags": []
 }
