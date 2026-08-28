@@ -1,0 +1,430 @@
+{
+  "updatedAt": "2026-08-27T10:09:14.698Z",
+  "createdAt": "2026-08-27T08:12:17.197Z",
+  "id": "qTzaygmkty3VlJSx",
+  "name": "Get all workflow from Google drive add to n8n-workflow-repaired",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        -160
+      ],
+      "id": "94e0523b-46e6-4608-96df-f91f1917d531",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Đọc dữ liệu từ buffer file JSON\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data'); // Đổi 'data' thành field binary tương ứng nếu khác\nconst jsonString = buffer.toString('utf-8');\nconst rawWorkflow = JSON.parse(jsonString);\n\n// Chỉ lấy các cài đặt hợp lệ trong settings để tránh bị API từ chối\nconst rawSettings = rawWorkflow.settings || {};\nconst cleanSettings = {\n  executionOrder: rawSettings.executionOrder || 'v1',\n  ...(rawSettings.timezone && { timezone: rawSettings.timezone }),\n  ...(rawSettings.saveExecutionProgress !== undefined && { saveExecutionProgress: rawSettings.saveExecutionProgress }),\n  ...(rawSettings.saveDataErrorExecution !== undefined && { saveDataErrorExecution: rawSettings.saveDataErrorExecution }),\n  ...(rawSettings.saveDataSuccessExecution !== undefined && { saveDataSuccessExecution: rawSettings.saveDataSuccessExecution }),\n  ...(rawSettings.saveManualExecutions !== undefined && { saveManualExecutions: rawSettings.saveManualExecutions }),\n  ...(rawSettings.callerPolicy && { callerPolicy: rawSettings.callerPolicy }),\n  ...(rawSettings.errorWorkflow && { errorWorkflow: rawSettings.errorWorkflow })\n};\n\n// Đóng gói đối tượng workflow sạch\nconst cleanWorkflow = {\n  name: rawWorkflow.name || 'Imported Workflow',\n  nodes: rawWorkflow.nodes || [],\n  connections: rawWorkflow.connections || {},\n  settings: cleanSettings,\n  staticData: rawWorkflow.staticData || null\n};\n\nreturn {\n  json: cleanWorkflow\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        -720
+      ],
+      "id": "8d7b8653-ea46-4542-be9b-cbd86355b9ce",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:5678/api/v1/workflows",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        448,
+        -48
+      ],
+      "id": "fbcb3fed-19ae-4bb3-ba78-cbed0816479a",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "jCAKMIeGthCFLu5k",
+          "name": "Header Auth account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "json",
+        "returnAll": true,
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -384,
+        -160
+      ],
+      "id": "ec3e4bac-1355-4ee3-8f25-e06799ebaf73",
+      "name": "Search files and folders",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "mf8kSfvvAtjIZS2T",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Đọc nội dung file JSON từ Binary Data bằng hàm helper của n8n\nconst binaryData = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst fileContent = JSON.parse(binaryData.toString('utf8'));\n\nreturn [{\n  json: {\n    name: fileContent.name || 'Imported Workflow',\n    nodes: fileContent.nodes || [],\n    connections: fileContent.connections || {},\n    settings: fileContent.settings || {}\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -176,
+        -768
+      ],
+      "id": "3ba2d5dd-dafe-4c34-ac80-f61853f74053",
+      "name": "Code in JavaScript1",
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "binaryPropertyName": "data",
+          "fileName": "={{ $json.name }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        0,
+        -48
+      ],
+      "id": "7e11666f-bd01-41e3-b6fc-55a9045aff95",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "mf8kSfvvAtjIZS2T",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -160,
+        -160
+      ],
+      "id": "e3d365c5-9b6b-4895-9818-c01558a9f420",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "chatId": "8760700059",
+        "text": "upload n8n workflow completed",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        144,
+        -240
+      ],
+      "id": "5d50cf8b-f4b6-4dba-abfb-17f151be253d",
+      "name": "Send a text message",
+      "webhookId": "93d73419-c78f-42e7-99fe-3847e59726f4",
+      "credentials": {
+        "telegramApi": {
+          "id": "JNZRFUkL5kKbrz0g",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const fileContent = JSON.parse(items[0].binary.data.toString('utf8'));\nreturn [{\n  json: {\n    name: fileContent.name || 'Imported Workflow',\n    nodes: fileContent.nodes || [],\n    connections: fileContent.connections || {},\n    settings: fileContent.settings || {}\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        144,
+        -752
+      ],
+      "id": "0d5c4baa-f98f-405e-aa7b-bf2ed69871b2",
+      "name": "Code in JavaScript2",
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const binaryData = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst fileContent = JSON.parse(binaryData.toString('utf8'));\n\nreturn {\n  json: {\n    name: fileContent.name || 'Imported Workflow',\n    nodes: fileContent.nodes || [],\n    connections: fileContent.connections || {},\n    settings: fileContent.settings || {}\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -784,
+        -752
+      ],
+      "id": "4a5f5ef4-917d-4e0a-a40a-533046b31f0a",
+      "name": "Code in JavaScript3",
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Đọc dữ liệu từ nút trước\nconst item = $input.first().json;\n\n// Xóa thuộc tính dư thừa gây lỗi API\nif (item.settings && item.settings.availableInMCP !== undefined) {\n  delete item.settings.availableInMCP;\n}\n\nreturn item;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        -720
+      ],
+      "id": "283d3c6e-1f03-4e7a-ab36-ef2a8a862f0c",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n\n// Xóa trường gây lỗi API\nif (item.settings) {\n  delete item.settings.availableInMCP;\n}\n\nreturn item;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        16,
+        -768
+      ],
+      "id": "c2453858-6181-490e-b9c8-cb4379167a24",
+      "name": "Code in JavaScript5"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Lấy dữ liệu workflow đã parse\nconst binaryData = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst fileContent = JSON.parse(binaryData.toString('utf8'));\n\n// Xóa trường settings dư thừa gây lỗi API nếu có\nif (fileContent.settings && fileContent.settings.availableInMCP !== undefined) {\n  delete fileContent.settings.availableInMCP;\n}\n\nreturn {\n  json: {\n    name: fileContent.name || 'Imported Workflow',\n    nodes: fileContent.nodes || [],\n    connections: fileContent.connections || {},\n    settings: fileContent.settings || {}\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        -736
+      ],
+      "id": "3f81e16b-5655-47b1-8bba-19511173be6f",
+      "name": "Code in JavaScript6"
+    },
+    {
+      "parameters": {
+        "jsCode": "const binaryData = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst fileContent = JSON.parse(binaryData.toString('utf8'));\n\n// Xóa thuộc tính gây lỗi API nếu có\nif (fileContent.settings) {\n  delete fileContent.settings.availableInMCP;\n}\n\nreturn {\n  json: {\n    name: fileContent.name || 'Imported Workflow',\n    nodes: fileContent.nodes || [],\n    connections: fileContent.connections || {},\n    settings: fileContent.settings || {}\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -384,
+        -768
+      ],
+      "id": "7642061f-49e8-4e99-b36e-931892d4463b",
+      "name": "Code in JavaScript7"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Đọc nội dung file JSON từ Google Drive\nconst binaryData = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst fileContent = JSON.parse(binaryData.toString('utf8'));\n\n// Bắt buộc xóa các thuộc tính không hợp lệ trong settings\nif (fileContent.settings) {\n  delete fileContent.settings.availableInMCP;\n}\n\nreturn {\n  json: {\n    name: fileContent.name || 'Imported Workflow',\n    nodes: fileContent.nodes || [],\n    connections: fileContent.connections || {},\n    settings: fileContent.settings || {}\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        -736
+      ],
+      "id": "a6759528-4a5c-4f3f-afef-49538a63718a",
+      "name": "Code in JavaScript8"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Đọc dữ liệu JSON từ Google Drive / nút trước\nconst binaryData = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst fileContent = JSON.parse(binaryData.toString('utf8'));\n\n// Lọc bỏ thuộc tính thừa trong settings\nlet cleanSettings = {};\nif (fileContent.settings) {\n  // Chỉ giữ lại các trường chuẩn mà n8n Public API hỗ trợ\n  if (fileContent.settings.executionOrder) cleanSettings.executionOrder = fileContent.settings.executionOrder;\n  if (fileContent.settings.binaryMode) cleanSettings.binaryMode = fileContent.settings.binaryMode;\n  if (fileContent.settings.timezone) cleanSettings.timezone = fileContent.settings.timezone;\n  if (fileContent.settings.saveExecutionProgress !== undefined) cleanSettings.saveExecutionProgress = fileContent.settings.saveExecutionProgress;\n  if (fileContent.settings.saveDataErrorExecution !== undefined) cleanSettings.saveDataErrorExecution = fileContent.settings.saveDataErrorExecution;\n  if (fileContent.settings.saveDataSuccessExecution !== undefined) cleanSettings.saveDataSuccessExecution = fileContent.settings.saveDataSuccessExecution;\n  if (fileContent.settings.saveManualExecutions !== undefined) cleanSettings.saveManualExecutions = fileContent.settings.saveManualExecutions;\n  if (fileContent.settings.callerPolicy) cleanSettings.callerPolicy = fileContent.settings.callerPolicy;\n  if (fileContent.settings.errorWorkflow) cleanSettings.errorWorkflow = fileContent.settings.errorWorkflow;\n}\n\nreturn {\n  json: {\n    name: fileContent.name || 'Imported Workflow',\n    nodes: fileContent.nodes || [],\n    connections: fileContent.connections || {},\n    settings: cleanSettings\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -576,
+        -752
+      ],
+      "id": "cc306b21-571d-4269-9fdf-436d17848cf0",
+      "name": "Code in JavaScript9"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Đọc dữ liệu JSON từ Google Drive / nút trước\nconst binaryData = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst fileContent = JSON.parse(binaryData.toString('utf8'));\n\n// Xóa hoặc làm sạch trường settings gây lỗi n8n API\ndelete fileContent.settings;\n\nreturn {\n  json: {\n    name: fileContent.name || 'Imported Workflow',\n    nodes: fileContent.nodes || [],\n    connections: fileContent.connections || {},\n    settings: {} // Đẩy settings rỗng để tránh dính thuộc tính không hợp lệ\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        -48
+      ],
+      "id": "b5c03c4b-3332-4793-b916-7a82092338af",
+      "name": "Code in JavaScript10"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        []
+      ]
+    },
+    "Search files and folders": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        []
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript5": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript6": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript7": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript8": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript9": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript10": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "3451fb42-29a7-4e02-9e7b-fbf026601b49",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-08-27T08:12:17.197Z",
+      "createdAt": "2026-08-27T08:12:17.197Z",
+      "role": "workflow:owner",
+      "workflowId": "qTzaygmkty3VlJSx",
+      "projectId": "qXi1KgDY8Rs5YRaI"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
