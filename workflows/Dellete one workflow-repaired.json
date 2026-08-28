@@ -1,0 +1,57 @@
+{
+  "updatedAt": "2026-08-28T07:07:11.433Z",
+  "createdAt": "2026-08-27T09:39:47.620Z",
+  "id": "nLBOhrzOpXhRKhZq",
+  "name": "Dellete one workflow-repaired",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "http://localhost:5678/api/v1/workflows/lpO6pUCiDizMZMKW",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -128,
+        -112
+      ],
+      "id": "afae8be6-6dfc-42b6-9d2a-28c92d10e1cc",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "jCAKMIeGthCFLu5k",
+          "name": "Header Auth account 5"
+        }
+      }
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "f91307d7-4319-407c-a8b5-2562dcc02088",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-08-27T09:39:47.620Z",
+      "createdAt": "2026-08-27T09:39:47.620Z",
+      "role": "workflow:owner",
+      "workflowId": "nLBOhrzOpXhRKhZq",
+      "projectId": "qXi1KgDY8Rs5YRaI"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
