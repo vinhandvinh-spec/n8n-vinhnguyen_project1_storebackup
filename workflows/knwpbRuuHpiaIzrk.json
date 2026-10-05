@@ -1,0 +1,216 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Download PPTX File": {
+      "main": [
+        [
+          {
+            "node": "File conversion to PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File conversion to PDF": {
+      "main": [
+        [
+          {
+            "node": "Write Result File to Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Download PPTX File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-09-13T07:17:36.691Z",
+  "description": null,
+  "id": "knwpbRuuHpiaIzrk",
+  "isArchived": false,
+  "meta": null,
+  "name": "My workflow 5",
+  "nodeGroups": [],
+  "nodes": [
+    {
+      "parameters": {
+        "content": "### PPTX to PDF Conversion Workflow\n*Credit: from Internet* \n*Compiled and shared by **LaPage Digital**:*\n- Visit [here](https://lapage.vn/en/tools/n8n-templates) for more **free templates**\n- Visit [here](https://lapage.vn/en/services/managed-hosting) for **N8N Hosting**",
+        "height": 200,
+        "width": 370,
+        "color": 4
+      },
+      "id": "59a9e989-ade8-4bcb-b6d8-9c06256094fc",
+      "name": "Sticky Note999",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {},
+      "id": "65fa9b52-c482-4fc9-ab88-ce85403af92c",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        384,
+        240
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "/home/node/.n8n/output/document.pdf",
+        "dataPropertyName": "={{ $json.data }}",
+        "options": {
+          "append": true
+        }
+      },
+      "id": "2869dbea-9e7c-4f21-b510-394ddfe76a5f",
+      "name": "Write Result File to Disk",
+      "type": "n8n-nodes-base.readWriteFile",
+      "position": [
+        992,
+        240
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Authentication\nConversion requests must be authenticated. Please create \n[ConvertAPI account to get authentication secret](https://www.convertapi.com/a/signin)",
+        "height": 132,
+        "width": 218
+      },
+      "id": "22db0b5c-f9c7-4c3e-950b-bd58ef196fd5",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        720,
+        112
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "url": "https://cdn.convertapi.com/public/files/demo.pptx",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "1460d2c0-5fad-4ddd-8b67-26b8387158c5",
+      "name": "Download PPTX File",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        592,
+        240
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://v2.convertapi.com/convert/pptx/to/pdf",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/octet-stream"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "=data"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "id": "617b5b18-91d5-4364-9007-fa0092d07f2b",
+      "name": "File conversion to PDF",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        784,
+        240
+      ],
+      "notesInFlow": true,
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "IfxskSCBO37kFDvP",
+          "name": "Query Auth account 2"
+        },
+        "httpBearerAuth": {
+          "id": "hEllmzVxjT4kOUj9",
+          "name": "Bearer Auth account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-09-13T07:17:36.695Z",
+      "createdAt": "2026-09-13T07:17:36.695Z",
+      "role": "workflow:owner",
+      "workflowId": "knwpbRuuHpiaIzrk",
+      "projectId": "ZiUGYYQTp9Yyodyq",
+      "project": {
+        "updatedAt": "2026-09-11T07:47:37.770Z",
+        "createdAt": "2026-09-11T07:45:50.395Z",
+        "id": "ZiUGYYQTp9Yyodyq",
+        "name": "Nguyen van vinh <vinhminh2005@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "customTelemetryTags": [],
+        "creatorId": "651a8662-df02-45e6-a0fc-b1c39d1348a1"
+      }
+    }
+  ],
+  "sourceWorkflowId": null,
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-09-13T07:46:35.642Z",
+  "versionCounter": 16,
+  "versionId": "93e58d46-6d71-429c-8432-6869eaddb826"
+}
