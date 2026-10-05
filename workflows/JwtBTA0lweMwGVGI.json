@@ -1,0 +1,106 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-09-24T11:19:26.046Z",
+  "description": null,
+  "id": "JwtBTA0lweMwGVGI",
+  "isArchived": false,
+  "meta": null,
+  "name": "My workflow 7",
+  "nodeGroups": [],
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "233c1319-42ed-44af-b52b-32e74006bf35",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://app-api.pixverse.ai/openapi/v2/video/text/generate",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "API-KEY",
+              "value": "sk-f6ced2489b6cfb03fbd385a476ee0b98"
+            },
+            {
+              "name": "Ai-trace-id",
+              "value": "different-ai-trace-id-for-each-unique-request"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"aspect_ratio\": \"16:9\",\n  \"duration\": 5,\n  \"model\": \"v4.5\",\n  \"motion_mode\": \"normal\",\n  \"negative_prompt\": \"string\",\n  \"prompt\": \"Against a deep black background, a flower made of transparent crystal floats in the center of the frame. Begin with a close-up showing the entire flower. Its petals slowly unfurl as delicate violet and rose-gold light passes through the crystal, creating flowing iridescent refractions along their edges. The camera slowly pushes in, keeping the flower in focus, while a few faint luminous particles drift gently around it. High-end jewelry advertising aesthetics, realistic glass refraction, a clean composition, and elegant, fluid movement. No text or logos.\",\n  \"quality\": \"540p\",\n  \"seed\": 0\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "5e4a9d06-a9fc-4d4d-aa69-75e4d99c09fb",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-09-24T11:19:26.051Z",
+      "createdAt": "2026-09-24T11:19:26.051Z",
+      "role": "workflow:owner",
+      "workflowId": "JwtBTA0lweMwGVGI",
+      "projectId": "ZiUGYYQTp9Yyodyq",
+      "project": {
+        "updatedAt": "2026-09-11T07:47:37.770Z",
+        "createdAt": "2026-09-11T07:45:50.395Z",
+        "id": "ZiUGYYQTp9Yyodyq",
+        "name": "Nguyen van vinh <vinhminh2005@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "customTelemetryTags": [],
+        "creatorId": "651a8662-df02-45e6-a0fc-b1c39d1348a1"
+      }
+    }
+  ],
+  "sourceWorkflowId": null,
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-09-24T11:30:57.647Z",
+  "versionCounter": 23,
+  "versionId": "9f6f00b3-22ad-44fb-a5f4-5104f357820e"
+}
